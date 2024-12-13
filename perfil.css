@@ -1,0 +1,73 @@
+body {
+  background-image: url('bg.jpg');
+  background-size: cover;
+  /*
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  */
+}
+
+.padre{
+	
+	gap: 10px;
+	margin: 10px;
+}
+
+.lista{
+
+	gap: 10px;
+	width: 100%;
+}
+
+.icono{
+	font-size: 45px;
+	background: black;
+	color: white;
+	border-radius: 15px;
+	margin-right:5px;
+}
+
+.botones{
+
+	width: 100%;
+}
+
+.paciente{
+	border: 2px solid;
+	border-color:firebrick;
+	border-radius: 8px;
+	width:100%;
+	max-width: 500px;
+}
+
+.paciente:hover{
+
+	background-color:floralwhite;
+}
+.comentario{
+
+	height: 300px;
+}
+
+.entrada{
+	border: 2px solid;
+	border-color:firebrick;
+	border-radius: 8px;
+	width:100%;
+	max-width: 1500px;
+}
+
+.entrada:hover{
+
+	background-color:floralwhite;
+}
+
+.titulo{
+
+	font-size: 20px;
+}
+
+.detalle{
+
+	height: 100px;
+}
