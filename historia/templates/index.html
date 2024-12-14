@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Hello, world!</h1>
+<br>
+<form method="POST" action="{% url 'index' %}">
+    {% csrf_token %}
+    {{ form }}
+    <button name="cargar">Cargar</button>
+</form>
+<br>
+<form method="POST" action="{% url 'index' %}">
+    {% csrf_token %}
+    <ul>
+        {% for persona in personas %}
+        <li>
+            ({{ persona.id }}) {{ persona.nombre }}, {{ persona.edad }}
+            <button name="borrar" value="{{ persona.id }}">Borrar</button>
+        </li>
+        {% endfor %}
+    </ul>
+</form>
+<br>
+<a href="{% url 'about' %}">About page</a>
+{% endblock %}
