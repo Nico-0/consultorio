@@ -12,6 +12,19 @@ def about(request):
     context['title'] = 'About'
     return render(request, 'about.html', context)
 
+def consultorio(request):
+    context = {}
+    context['title'] = 'Consultorio'
+    context['css'] = 'consultorio.css'
+    context['active'] = True
+    return render(request, 'consultorio.html', context)
+
+def perfil(request):
+    context = {}
+    context['title'] = 'Perfil'
+    context['css'] = 'perfil.css'
+    return render(request, 'perfil.html', context)
+
 from historia.models import Persona
 from historia.forms import PersonaForm
 
