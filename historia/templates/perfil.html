@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1 class="text-center">Apellido, nombre</h1>
+<h1 class="text-center">{{ persona.apellido }}, {{ persona.nombre }}</h1>
 
 <div class="d-flex flex-column mb-3 padre align-items-center">
 
 	<div class="d-flex flex-row bd-highlight mb-3 botones justify-content-around">
 		<button type="button" class="btn btn-outline-primary">Cambiar datos</button>
-		<button type="button" class="btn btn-outline-secondary">Desactivar paciente</button>
+		<button type="button" class="btn btn-outline-secondary" style="min-width: 150px;" placeholder="Desactivar paciente"></button>
 	</div>
 	
 
@@ -18,33 +18,33 @@
 		<div class="p-2">
 			<label for="nacimiento" class="form-label">Nacimiento:</label>
 			<div class="d-flex flex-row align-items-end"> 
-				<input type="text" class="form-control w-50" value="1994-12-31" id="nacimiento">
-				<label class="form-label ms-3">30 años</label>
+				<input type="text" class="form-control w-50" value="{{ persona.nacimiento }}" id="nacimiento">
+				<label class="form-label ms-3">{{ persona.edad }} años</label>
 			</div>
 		</div>
 		<div class="p-2">
 			<label for="dni" class="form-label">DNI:</label>
-			<input type="text" class="form-control w-50" value="99000222" id="dni">
+			<input type="text" class="form-control w-50" value="{{ persona.dni }}" id="dni">
         </div>
 		<div class="d-flex flex-row"> 
 			<div class="p-2">
 				<label for="obra" class="form-label">Obra social:</label>
-				<input type="text" class="form-control " value="PAMI" id="obra">
+				<input type="text" class="form-control " value="{{ persona.obraSocial }}" id="obra">
 			</div>
 			<div class="p-2">
 				<label for="afiliado" class="form-label">Número de afiliado:</label>
-				<input type="text" class="form-control " value="20333555" id="afiliado">
+				<input type="text" class="form-control " value="{{ persona.afiliado }}" id="afiliado">
 			</div>
 		</div>
 		
 		<div class="d-flex flex-row"> 
 			<div class="p-2">
 				<label for="tel" class="form-label">Teléfono:</label>
-				<input type="text" class="form-control " value="11 2233 4455" id="tel">
+				<input type="text" class="form-control " value="{{ persona.telefono }}" id="tel">
 			</div>
 			<div class="p-2">
 				<label for="localidad" class="form-label">Localidad:</label>
-				<input type="text" class="form-control " value="Olivos" id="localidad">
+				<input type="text" class="form-control " value="{{ persona.localidad }}" id="localidad">
 			</div>
 		</div>
 		</fieldset>
@@ -53,7 +53,7 @@
 	  </div>
 	  <div class="p-2 paciente">
 		<p class="titulo">Comentarios</p>
-		<textarea class="form-control comentario" aria-label="With textarea">Tiene 2 chihuahuas y quiere hacer un negocio de criaderos</textarea>
+		<textarea class="form-control comentario" aria-label="With textarea" placeholder="Tiene 2 chihuahuas y quiere hacer un negocio de criaderos">{{ persona.comentarios }}</textarea>
 		<div class="d-flex justify-content-center"> 
 			<button type="button" class="btn btn-outline-success mt-3">Guardar</button>
 		</div>
@@ -68,21 +68,23 @@
 <div class="d-flex flex-column mb-3 padre align-items-center">
 
 	<div class="d-flex flex-row bd-highlight mb-3 botones justify-content-around">
-		<button type="button" class="btn btn-outline-primary">Nueva entrada</button>
+		<button type="button" class="btn btn-outline-primary" style="min-width: 150px;" placeholder="Nueva entrada"></button>
 		<button type="button" class="btn btn-outline-secondary">Viendo nuevas primero <i class="las la-arrow-down"></i> <i class="las la-arrow-up"></i></button>
 	</div>
 	
 
 	<div class="d-flex flex-column mb-3 lista align-items-center">
-	  <div class="p-2 entrada">
-		<p class="titulo">31 de diciembre de 2024</p>
-		<textarea class="form-control detalle" aria-label="With textarea">Hoy el paciente se portó bien y le recetamos muchas pastillas</textarea>
-	  </div>
-	  <div class="p-2 entrada">Flex item 2</div>
-	  <div class="p-2 entrada">Flex item 3</div>
+		{% for entrada in entradas %}
+		<div class="p-2 entrada">
+			<p class="titulo">{{ entrada.fecha }}</p>
+			<textarea class="form-control detalle" aria-label="With textarea" placeholder="Hoy el paciente se portó bien y le recetamos muchas pastillas">{{ entrada.comentarios }}</textarea>
+		</div>
+        {% endfor %}
+	  
+	  <div class="p-2 entrada">31 de diciembre de 2024</div>
 	</div>
 
-	<nav aria-label="Page navigation example">
+	<nav aria-label="Page navigation example" style="visibility: hidden;">
 	  <ul class="pagination">
 		<li class="page-item"><a class="page-link" href="#">Previous</a></li>
 		<li class="page-item"><a class="page-link" href="#">1</a></li>

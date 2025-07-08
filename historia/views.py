@@ -6,6 +6,9 @@ def index(request):
     return HttpResponse("Hello, world!")
 """
 from django.shortcuts import render
+from historia.models import Persona
+from historia.forms import PersonaForm
+from django.shortcuts import get_object_or_404
 
 def about(request):
     context = {}
@@ -17,16 +20,18 @@ def consultorio(request):
     context['title'] = 'Consultorio'
     context['css'] = 'consultorio.css'
     context['active'] = True
+    personas = Persona.objects.all()
+    context['personas'] = personas
     return render(request, 'consultorio.html', context)
 
-def perfil(request):
+def perfil(request, persona_id):
     context = {}
     context['title'] = 'Perfil'
     context['css'] = 'perfil.css'
+    persona = get_object_or_404(Persona, id=persona_id)
+    context['persona'] = persona
+    context['entradas'] = persona.entrada_set.all()
     return render(request, 'perfil.html', context)
-
-from historia.models import Persona
-from historia.forms import PersonaForm
 
 def index(request):
     context = {}
