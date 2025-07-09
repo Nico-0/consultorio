@@ -3,8 +3,7 @@ from django.utils import timezone
 
 class Persona(models.Model):
     nombre = models.CharField(max_length=50)
-    apellido = models.CharField(max_length=50, blank=True, default="")
-    edad = models.PositiveSmallIntegerField()
+    apellido = models.CharField(max_length=50,)
     nacimiento = models.DateField(default=timezone.now)
     dni = models.CharField(max_length=10, blank=True, default="")
     obraSocial = models.CharField(max_length=50, blank=True, default="")

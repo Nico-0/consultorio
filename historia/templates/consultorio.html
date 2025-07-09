@@ -6,7 +6,7 @@
 <div class="d-flex flex-column mb-3 padre align-items-center">
 
 	<div class="d-flex flex-row bd-highlight mb-3 botones justify-content-around">
-	  <button type="button" class="btn btn-outline-primary">Nuevo paciente</button>
+	  <button type="button" class="btn btn-outline-primary" id="nuevoPaciente">Nuevo paciente</button>
 	  <div class="dropdown">
 		<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 		  Filtrar
@@ -20,13 +20,21 @@
 		</ul>
       </div>
 	</div>
-	
+
+	<form method="POST" action="/" id="cargaPaciente" style="visibility: hidden; position: absolute">
+		{% csrf_token %}
+		{{ form }}
+		<button name="cargar">Cargar</button>
+	</form>
 
 	<div class="d-flex flex-column mb-3 lista align-items-center">
 		{% for persona in personas %}
 		<a class="p-2 paciente" href="{% url 'perfil' persona.id %}">
-			<p class="titulo">{{ persona.apellido }}, {{ persona.nombre }}</p>
-			<p>{{ persona.edad }} años</p>
+			<p class="titulo" style="text-align: center;">{{ persona.apellido }}, {{ persona.nombre }}</p>
+			<p>DNI: {{ persona.dni }}</p>
+			<p>Nacimiento: {{ persona.nacimiento }}</p>
+			<p>Obra Social: {{ persona.obraSocial }}</p>
+			<p style="text-align: right; font-size: 0.7em; margin-bottom: 0;">Datos actualizados: {{ persona.modificado }}</p>
 		</a>
         {% endfor %}
 	</div>

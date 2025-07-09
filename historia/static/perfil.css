@@ -53,13 +53,17 @@ body {
 	border: 2px solid;
 	border-color:firebrick;
 	border-radius: 8px;
-	width:100%;
+	width:90%;
 	max-width: 1500px;
 }
 
 .entrada:hover{
 
 	background-color:floralwhite;
+}
+
+#entradaHoy{
+	min-height: 150px;
 }
 
 .titulo{
@@ -71,3 +75,4 @@ body {
 
 	height: 100px;
 }
+
