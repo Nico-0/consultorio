@@ -13,7 +13,7 @@
     <ul>
         {% for persona in personas %}
         <li>
-            ({{ persona.id }}) {{ persona.nombre }}, {{ persona.edad }}
+            ({{ persona.id }}) {{ persona.nombre }}, {{ persona.dni }}
             <button name="borrar" value="{{ persona.id }}">Borrar</button>
         </li>
         {% endfor %}

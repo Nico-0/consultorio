@@ -24,7 +24,7 @@
 	<form method="POST" action="/" id="cargaPaciente" style="visibility: hidden; position: absolute">
 		{% csrf_token %}
 		{{ form }}
-		<button name="cargar">Cargar</button>
+		<button class="btn btn-outline-success" name="cargar">Cargar</button>
 	</form>
 
 	<div class="d-flex flex-column mb-3 lista align-items-center">

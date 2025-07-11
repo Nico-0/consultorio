@@ -17,7 +17,7 @@
 		<form method="POST" action="/perfil/{{persona.id}}" id="cargaDatos" style="visibility: hidden; position: absolute">
 			{% csrf_token %}
 			{{ form.as_p }}
-			<button name="cargar">Cargar</button>
+			<button class="btn btn-outline-success" name="cargar">Cargar</button>
 		</form>
 		<fieldset disabled id="displayDatos">
 		<div class="p-2">
@@ -80,7 +80,7 @@
 
 	<div class="d-flex flex-column mb-3 lista align-items-center">
 		<div class="p-2 entrada">
-			<p class="titulo">Entrada de hoy: {{ diaHoy }}</p>
+			<p class="titulo">Entrada de hoy: {{ diaHoy|date:"l, j F Y" }}</p>
 			<textarea class="form-control detalle" id="entradaHoy" aria-label="With textarea" placeholder="Hoy el paciente se portó bien y le recetamos muchas pastillas">{{ entradaHoy }}</textarea>
 		</div>
 		{% for entrada in entradas %}
@@ -90,7 +90,6 @@
 		</div>
         {% endfor %}
 	  
-	  <div class="p-2 entrada">Martes, 31 de diciembre de 2024</div>
 	</div>
 
 	<nav aria-label="Page navigation example" style="visibility: hidden;">

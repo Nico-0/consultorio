@@ -19,6 +19,22 @@ def about(request):
     context['title'] = 'About'
     return render(request, 'about.html', context)
 
+def backups(request):
+    context = {}
+    context['title'] = 'Backups'
+    context['css'] = 'consultorio.css'
+    context['activeB'] = True
+    import os
+    from .backup import get_last_backup_time, hacerBackup
+    from django.conf import settings
+    context['backups'] = "\n".join(os.listdir('./backups')[::-1])
+    context['lastBackup'] = get_last_backup_time()
+    context['carpeta'] = settings.DRIVE_FOLDER_ID
+    if request.method == 'POST':
+        if 'generar' in request.POST:
+            hacerBackup()
+    return render(request, 'backups.html', context)
+
 def consultorio(request):
     context = {}
     context['title'] = 'Consultorio'
@@ -50,7 +66,7 @@ def perfil(request, persona_id):
     context['diaHoy'] = diaHoy
     if(entradas): 
         if((entradas[0]).fecha == diaHoy):
-            context['entradaHoy'] = entradas[0].comentarios
+            context['entradaHoy'] = entradas[0].comentarios # toma la ultima porque el modelo tiene ordering '-fecha'
 
     form = PacienteForm(instance=persona)
     context['form'] = form
@@ -75,7 +91,7 @@ def comentarios(request, persona_id):
 
     return JsonResponse({'error': 'invalid method'}, status=405)
 
-def entrada(request, persona_id):
+def entrada(request, persona_id): # solo se puede modificar la entrada de hoy
     if request.method == 'POST':
         data = json.loads(request.body)
         new_value = data.get('value')

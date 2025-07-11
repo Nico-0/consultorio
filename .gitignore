@@ -1,2 +1,5 @@
 db.sqlite3
 *.pyc
+service_account*.json
+last_backup.txt
+backups/
