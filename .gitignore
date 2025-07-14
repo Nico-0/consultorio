@@ -3,3 +3,5 @@ db.sqlite3
 service_account*.json
 last_backup.txt
 backups/
+client_secrets*.json
+credentials.json
