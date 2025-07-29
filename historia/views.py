@@ -13,10 +13,62 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.http import JsonResponse
 import json
+import os
+import requests
 
 def about(request):
+    import subprocess
+    import socket
     context = {}
     context['title'] = 'About'
+    context['css'] = 'consultorio.css'
+    context['activeC'] = True
+    context['ip'] = socket.gethostbyname(socket.gethostname()) + ':8000'
+    
+    """ Opcion no usada, pero seria util en caso de a futuro no querer usar la api y comparar todo local
+    gitcmderror = subprocess.run(['git', 'fetch'], capture_output=True, text=True, shell=True).returncode
+    gitstatus = subprocess.run(['git', 'status'], capture_output=True, text=True, shell=True).stdout.splitlines()[1]
+    if(gitstatus.startswith('Your branch is behind')):
+        # Hay nueva version disponible
+        context['botonUpdate'] = True # activar boton de update y su descripcion
+    else:
+        # Para Para 'Your branch is up to date' o cualquier error
+        # Falta considerar 'HEAD detached at' (checkout de commit anterior)
+        context['botonUpdate'] = False
+    """
+    
+    context['botonUpdate'] = False
+    gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True, shell=True)
+    if(gitcmd.returncode):
+        context['version'] = context['botonText'] = 'Git no instalado'
+    else:
+        commitActual = gitcmd.stdout.strip()
+        context['version'] = commitActual
+        try: # fetch git commits api
+            response = requests.get("https://api.github.com/repos/Nico-0/consultorio/commits")
+            response.raise_for_status()
+            data = response.json()
+            ultimoCommit = data[0]['sha'][:7]
+            if(commitActual == ultimoCommit):
+                context['botonText'] = 'Última versión instalada'
+            else:
+                context['botonUpdate'] = True
+                context['botonText'] = 'Actualizar a la última versión'
+            commits = []
+            for commit in data:
+                commits.append({'fecha': commit['commit']['committer']['date'][:10], 'hash': commit['sha'][:7]})
+            context['commits'] = commits
+
+        except requests.exceptions.RequestException as e:
+            context['error'] = f"Error de conexion: reinicie la pagina"#: {e}"
+            context['botonText'] = 'Error de conexión'
+    
+    if request.method == 'POST': # todo ponerlo en una url mas descriptiva
+        # actualizar programa
+        if 'pull' in request.POST:
+            subprocess.run(['git', 'pull'])
+            subprocess.run(['python', 'manage.py', 'migrate'])
+    
     return render(request, 'about.html', context)
 
 def backups(request):
@@ -24,7 +76,6 @@ def backups(request):
     context['title'] = 'Backups'
     context['css'] = 'consultorio.css'
     context['activeB'] = True
-    import os
     from .backup import get_last_backup_time, hacerBackup
     from django.conf import settings
     context['backups'] = "\n".join(os.listdir('./backups')[::-1])

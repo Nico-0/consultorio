@@ -75,7 +75,7 @@ def rutinaBackup():
     last_backup = get_last_backup_time()
     delta = relativedelta(timezone.localtime(timezone.now()).replace(tzinfo=None), last_backup).days
     print("\nUltimo backup: ", last_backup, file=sys.stderr)
-    if(delta > 6 or last_backup is None):
+    if(delta > 2 or last_backup is None):
         hacerBackup()
     else:
         print("Dias desde el ultimo backup: ", delta, "\n", file=sys.stderr)

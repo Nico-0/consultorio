@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,9 @@ SECRET_KEY = 'django-insecure-75(gtt$ltn^brj0&u7*%7hiqm@)-&u6pxrnl7g#_j*bpfp2v3n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# append local ip, works for the first network adapter, disable virtual adapters
+ALLOWED_HOSTS.append(socket.gethostbyname(socket.gethostname()))
 
 # Custom settings
 DRIVE_FOLDER_ID = ""

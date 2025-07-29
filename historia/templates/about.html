@@ -1,5 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>About Page!</h1>
-<a href="{% url 'index' %}">Go home</a>
+
+<div class="d-flex flex-column mb-3 mt-5 padre align-items-center">
+
+    <p>Programa de consultorio</p>
+    <label>Link red local:</label>
+    <input type="text" class="mb-3" value="{{ip}}" disabled> 
+
+    <h2 class="text-center">Versión actual</h2>
+
+    <p>Versión: {{version}}</p>
+
+    <form method="POST" action="/about/" id="">
+		{% csrf_token %}
+		<button class="btn btn-outline-success mb-5" name="pull" {% if botonUpdate is False %}disabled{% endif %}>{{botonText}}</button>
+	</form>
+
+    <h3 class="text-center">Lista de versiones:</h3>
+
+    {{error}}
+    <table class="table" style="max-width: 25em;">
+        <thead>
+            <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Versión</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for commit in commits %}
+            <tr>
+                <td>{{commit.fecha}}</td>
+                <td>{{commit.hash}}</td>
+            </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+
+
+</div>
+
 {% endblock %}
