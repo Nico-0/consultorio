@@ -10,4 +10,5 @@ urlpatterns = [
     path('backups/', views.backups, name='backups'),
     path('perfil/<int:persona_id>/comentarios', views.comentarios, name='comentarios'),
     path('perfil/<int:persona_id>/entrada', views.entrada, name='entrada'),
+    path('perfil/<int:persona_id>/activo', views.activo, name='activo'),
 ]

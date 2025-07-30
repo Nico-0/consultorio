@@ -7,11 +7,13 @@ def index(request):
 """
 from django.shortcuts import render
 from historia.models import Persona
-from historia.forms import PersonaForm, PacienteForm
+from historia.forms import PersonaForm, PacienteForm, PacienteFullForm
 from django.shortcuts import get_object_or_404
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.contrib import messages
 import json
 import os
 import requests
@@ -44,7 +46,7 @@ def about(request):
     else:
         commitActual = gitcmd.stdout.strip()
         context['version'] = commitActual
-        try: # fetch git commits api
+        try: # fetch github commits api
             response = requests.get("https://api.github.com/repos/Nico-0/consultorio/commits")
             response.raise_for_status()
             data = response.json()
@@ -92,7 +94,7 @@ def consultorio(request):
     context['css'] = 'consultorio.css'
     context['js'] = 'consultorio.js'
     context['active'] = True
-    context['personas'] = Persona.objects.all()
+    context['personas'] = Persona.objects.filter(activo=True)
     context['form'] = PacienteForm()
     if request.method == 'POST':
         if 'cargar' in request.POST:
@@ -100,8 +102,30 @@ def consultorio(request):
             # if form.is_valid()
             # persona = form.save(commit=False)
             # persona.save()
+            if not form.is_valid():
+                redirect = validar_form_dni(request, form)
+                if redirect: return redirect
+                #new_form = validar_form_email(request, form)
+                #if new_form.data: form = new_form
             form.save()
     return render(request, 'consultorio.html', context)
+
+def validar_form_dni(request, form):
+    if 'dni' in form.errors: # captura solo error de dni
+        # encontrar usuario existente y redireccionar
+        input_dni = form.data.get('dni')
+        persona_existente = get_object_or_404(Persona, dni=input_dni)
+        messages.warning(request, 'Paciente existente encontrado con DNI: '+input_dni)
+        return redirect('/perfil/'+str(persona_existente.id))
+    print(form.errors)
+
+def validar_form_email(request, form): #validacion en caso de cambiar email a models.EmailField
+    if 'email' in form.errors: # parece que del frontend no valida que se incluya .com
+        mutable_post = request.POST.copy()
+        email = mutable_post.get('email', '')
+        email += '.com'
+        mutable_post['email'] = email
+        return PersonaForm(mutable_post) #crea correctamente el objeto, pero el form.save() no guarda ni email ni apellido ¿?
 
 def perfil(request, persona_id):
     context = {}
@@ -119,11 +143,15 @@ def perfil(request, persona_id):
         if((entradas[0]).fecha == diaHoy):
             context['entradaHoy'] = entradas[0].comentarios # toma la ultima porque el modelo tiene ordering '-fecha'
 
-    form = PacienteForm(instance=persona)
+    form = PacienteFullForm(instance=persona)
     context['form'] = form
     if request.method == 'POST':
         if 'cargar' in request.POST:
-            form = PacienteForm(request.POST, instance=persona)
+            form = PacienteFullForm(request.POST, instance=persona)
+            if not form.is_valid():
+                redirect = validar_form_dni(request, form)
+                if redirect: return redirect
+            print(form.errors)
             form.save()
     return render(request, 'perfil.html', context)
 
@@ -159,6 +187,16 @@ def entrada(request, persona_id): # solo se puede modificar la entrada de hoy
             return JsonResponse({'status': 'not found'}, status=404)
 
     return JsonResponse({'error': 'invalid method'}, status=405)
+
+def activo(request, persona_id):
+    if request.method == 'POST':
+        try:
+            paciente = Persona.objects.get(id=persona_id)
+            paciente.activo = not paciente.activo
+            paciente.save()
+        except Persona.DoesNotExist:
+            return JsonResponse({'status': 'persona not found'}, status=404)
+    return redirect('/perfil/'+str(persona_id))
 
 def index(request):
     context = {}

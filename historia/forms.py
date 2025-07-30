@@ -10,7 +10,12 @@ class PersonaForm(forms.ModelForm):
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Persona
-        fields = ['nombre', 'apellido', 'nacimiento', 'dni', 'obraSocial', 'afiliado', 'telefono', 'localidad', ]
-        widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
-        }
+        fields = ['apellido', 'nombre', 'nacimiento', 'dni', 'obraSocial', 'afiliado', 'email']
+        widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')}
+        
+class PacienteFullForm(forms.ModelForm):
+    class Meta:
+        model = Persona
+        fields = ['apellido', 'nombre', 'nacimiento', 'dni', 'obraSocial', 'afiliado', 'obraSocial2', 'afiliado2', 'email', 'telefono', 'localidad', 'extras']
+        widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')}
 

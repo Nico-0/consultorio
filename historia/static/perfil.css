@@ -69,3 +69,10 @@
 	height: 100px;
 }
 
+.desactivado{
+	background: repeating-linear-gradient(
+	45deg, 
+	#cc7777, #eebbbb 5px,
+	#eeeeee 20px, #ffffff 200px
+	);
+}

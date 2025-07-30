@@ -6,6 +6,7 @@ class HistoriaConfig(AppConfig):
     name = 'historia'
 
     def ready(self):
+        import historia.signals
         from .backup import rutinaBackup
         rutinaBackup()
 
