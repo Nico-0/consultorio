@@ -46,7 +46,7 @@
 	border: 2px solid;
 	border-color:firebrick;
 	border-radius: 8px;
-	width:90%;
+	width:96%;
 	max-width: 1500px;
 }
 
@@ -75,4 +75,38 @@
 	#cc7777, #eebbbb 5px,
 	#eeeeee 20px, #ffffff 200px
 	);
+}
+
+button.saveIndicator{
+	min-width: 150px;
+	border: none;
+}
+
+.hidden{
+	visibility: hidden;
+}
+
+.widthBoton{
+	width: 11em;
+}
+
+.izquierda{
+	width: 40%;
+}
+
+.derecha {
+	width: 58%;
+}
+
+@media (width <= 920px) {
+	.izquierda{
+		width: 100%;
+	}
+
+	.derecha {
+		width: 100%;
+	}
+	.widthBoton{
+		width: 6em;
+	}
 }
