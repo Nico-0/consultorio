@@ -6,11 +6,11 @@ def index(request):
     return HttpResponse("Hello, world!")
 """
 from django.shortcuts import render
-from historia.models import Persona
+from historia.models import Persona, Entrada
 from historia.forms import PersonaForm, PacienteForm, PacienteFullForm
 from django.shortcuts import get_object_or_404
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
+from django.utils import timezone, dateparse
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -139,9 +139,12 @@ def perfil(request, persona_id):
     diaHoy = timezone.localdate()
     context['edadHoy'] = relativedelta(diaHoy, persona.nacimiento).years
     context['diaHoy'] = diaHoy
-    if(entradas): 
-        if((entradas[0]).fecha == diaHoy):
-            context['entradaHoy'] = entradas[0].comentarios # toma la ultima porque el modelo tiene ordering '-fecha'
+    diaParam = request.GET.get('dia')
+    diaElegido = dateparse.parse_datetime(diaParam) if diaParam else diaHoy
+    entradaElegida = Entrada.objects.filter(paciente=persona_id, fecha=diaElegido).first()
+    context['diaElegido'] = diaElegido
+    if entradaElegida:
+        context['entradaElegida'] = entradaElegida.comentarios
 
     form = PacienteFullForm(instance=persona)
     context['form'] = form
@@ -170,16 +173,16 @@ def comentarios(request, persona_id):
 
     return JsonResponse({'error': 'invalid method'}, status=405)
 
-def entrada(request, persona_id): # solo se puede modificar la entrada de hoy
+def entrada(request, persona_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         new_value = data.get('value')
-        diaHoy = timezone.localdate()
+        diaElegido = dateparse.parse_datetime(data.get('date'))
         persona = Persona.objects.get(id=persona_id)
 
         from historia.models import Entrada
         try:
-            entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=diaHoy, defaults={"comentarios": ""})
+            entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=diaElegido, defaults={"comentarios": ""})
             entrada.comentarios = new_value
             entrada.save()
             return JsonResponse({'status': 'success'})

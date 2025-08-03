@@ -107,18 +107,29 @@
 			<div class="d-flex flex-column mb-3 padre align-items-center">
 
 				<button type="button" class="btn btn-outline-secondary hidden" style="position: absolute;">Viendo nuevas primero <i class="las la-arrow-down"></i> <i class="las la-arrow-up"></i></button>
+				<fieldset id="">
+					<input type="date" class="form-control" id="editDate" max="{{ diaHoy|date:'Y-m-d' }}" value="{{ diaElegido|date:'Y-m-d' }}">
+				</fieldset>
 
 				<div class="d-flex flex-column mb-3 lista align-items-center">
 					<div class="p-2 entrada">
+						{% if diaHoy == diaElegido %}
+						<p class="titulo">Hoy:</p>{% else %}
 						<div class="d-flex justify-content-between">
-							<p class="titulo">Entrada de hoy: {{ diaHoy|date:"l, j F Y" }}</p>
+							<p class="titulo">Dia anterior:</p>
+							<a href="/perfil/{{persona.id}}" class="btn btn-primary" style="height: 2.4em;">Volver a hoy</a>
+						</div>
+						{% endif %}
+																			
+						<div class="d-flex justify-content-between">
+							<p class="titulo">{{ diaElegido|date:"l, j F Y" }}</p>
 							<button type="" class="btn saveIndicator" id="statusEntrada" disabled></button>
 						</div>
-						<textarea class="form-control detalle" id="entradaHoy" aria-label="With textarea" placeholder="Escribir aquí la historia clínica del día indicado">{{ entradaHoy }}</textarea>
+						<textarea class="form-control detalle" id="entradaHoy" aria-label="With textarea" placeholder="Escribir aquí la historia clínica del día {{ diaElegido|date:'l, j F Y' }}">{{ entradaElegida }}</textarea>
 					</div>
 					{% for entrada in entradas %}
 					<div class="p-2 entrada">
-						<p class="titulo">{{ entrada.fecha }}</p>
+						<p class="titulo">{{ entrada.fecha|date:"l, j F Y" }}</p>
 						<textarea class="form-control detalle" aria-label="With textarea" placeholder="Vacia" disabled>{{ entrada.comentarios }}</textarea>
 					</div>
 					{% endfor %}

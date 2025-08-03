@@ -22,6 +22,8 @@ document.getElementById("cambiar").addEventListener("click", toggle('displayDato
 
 let timeout1 = null;
 let timeout2 = null;
+const editDateElement = document.getElementById("editDate")
+const editDate = editDateElement.value
 
 function inputListener(timeout, elementStatus, path) {
     return function() {
@@ -40,7 +42,8 @@ function inputListener(timeout, elementStatus, path) {
                     'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify({
-                    value: value
+                    value: value,
+                    date: editDate
                 })
             })
             .then(response => response.json())
@@ -62,7 +65,14 @@ function inputListener(timeout, elementStatus, path) {
 document.getElementById('comentarios').addEventListener("input", inputListener(timeout1, 'status', '/comentarios'));
 document.getElementById('entradaHoy').addEventListener("input", inputListener(timeout2, 'statusEntrada', '/entrada'));
 
-
+let timeout3 = null;
+editDateElement.addEventListener("change", function() {
+            clearTimeout(timeout3);
+            timeout3 = setTimeout(() => {
+            const selectedDate = this.value;
+            window.location.href = window.location.origin + window.location.pathname + `?dia=${selectedDate}`;
+            }, 1000);
+        });
 
 function copiarDatos() {
     navigator.clipboard.writeText('datos');
