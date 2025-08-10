@@ -30,7 +30,15 @@ class Entrada(models.Model):
     comentarios = models.TextField(blank=True, default="")
 
     def __str__(self):
-        return "Entrada " + self.fecha
+        return "Entrada " + str(self.fecha)
 
     class Meta:
         ordering = ['-fecha']
+
+def directorio(instance, filename):
+    # MEDIA_ROOT/paciente_<id>/<filename>
+    return 'paciente_{0}/{1}'.format(instance.entrada.paciente.id, filename)
+
+class Imagen(models.Model):
+    entrada = models.ForeignKey(Entrada, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.ImageField(upload_to=directorio, null = True)

@@ -5,3 +5,5 @@ last_backup.txt
 backups/
 client_secrets*.json
 credentials.json
+media/
+historia/static/qrip.png

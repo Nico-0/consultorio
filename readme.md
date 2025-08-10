@@ -4,7 +4,9 @@
 
 - Disable debug mode in `consultorio/settings.py`
 
-- pip install django
+- `pip install django`
+- `pip install pillow-heif`
+- `pip install qrcode`
 - `python manage.py runserver`
 - `python manage.py makemigrations`
 - `python manage.py migrate`

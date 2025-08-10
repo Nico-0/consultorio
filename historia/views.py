@@ -6,8 +6,8 @@ def index(request):
     return HttpResponse("Hello, world!")
 """
 from django.shortcuts import render
-from historia.models import Persona, Entrada
-from historia.forms import PersonaForm, PacienteForm, PacienteFullForm
+from historia.models import Persona, Entrada, Imagen
+from historia.forms import PersonaForm, PacienteForm, PacienteFullForm, ImagenUploadForm
 from django.shortcuts import get_object_or_404
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone, dateparse
@@ -17,6 +17,9 @@ from django.contrib import messages
 import json
 import os
 import requests
+from PIL import Image
+from django.core.files.base import ContentFile
+from io import BytesIO
 
 def about(request):
     import subprocess
@@ -68,6 +71,7 @@ def about(request):
     if request.method == 'POST': # todo ponerlo en una url mas descriptiva
         # actualizar programa
         if 'pull' in request.POST:
+            # todo hacer backup antes de actualizar
             subprocess.run(['git', 'pull'])
             subprocess.run(['python', 'manage.py', 'migrate'])
     
@@ -134,28 +138,49 @@ def perfil(request, persona_id):
     context['js'] = 'perfil.js'
     persona = get_object_or_404(Persona, id=persona_id)
     context['persona'] = persona
-    entradas = persona.entrada_set.all()
+    entradas = persona.entrada_set.all().prefetch_related('imagenes')
     context['entradas'] = entradas
     diaHoy = timezone.localdate()
     context['edadHoy'] = relativedelta(diaHoy, persona.nacimiento).years
     context['diaHoy'] = diaHoy
     diaParam = request.GET.get('dia')
-    diaElegido = dateparse.parse_datetime(diaParam) if diaParam else diaHoy
+    diaElegido = dateparse.parse_date(diaParam) if diaParam else diaHoy
     entradaElegida = Entrada.objects.filter(paciente=persona_id, fecha=diaElegido).first()
     context['diaElegido'] = diaElegido
-    if entradaElegida:
-        context['entradaElegida'] = entradaElegida.comentarios
+    context['entradaElegida'] = entradaElegida
+    context['imagenes'] = Imagen.objects.filter(entrada=entradaElegida)
 
-    form = PacienteFullForm(instance=persona)
-    context['form'] = form
+    context['form'] = PacienteFullForm(instance=persona)
     if request.method == 'POST':
-        if 'cargar' in request.POST:
+        if 'cargarDatos' in request.POST:
             form = PacienteFullForm(request.POST, instance=persona)
             if not form.is_valid():
-                redirect = validar_form_dni(request, form)
-                if redirect: return redirect
+                redirectx = validar_form_dni(request, form)
+                if redirectx: return redirectx
             print(form.errors)
             form.save()
+        if 'cargaImagen' in request.POST:
+            import pillow_heif
+            pillow_heif.register_heif_opener()
+            formImagen = ImagenUploadForm(request.POST, request.FILES)
+            if formImagen.is_valid():
+                fecha = formImagen.cleaned_data['fecha'] # en caso de querer subir una imagen para una entrada inexistente, no existe su id, entonces se trae la fecha
+                entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=fecha, defaults={"comentarios": ""})
+                imagen = formImagen.save(commit=False)
+                imagen.entrada = entrada
+                
+                # process image
+                uploaded_img = request.FILES['imagen']
+                img = Image.open(uploaded_img)
+                img.thumbnail((1024, 1024)) #max_size
+                img_io = BytesIO()
+                img.save(img_io, format='JPEG', quality=75, optimize=True)
+                img_content = ContentFile(img_io.getvalue(), name=f"{uploaded_img.name.rsplit('.', 1)[0]}.jpg")
+                imagen.imagen = img_content             
+
+                imagen.save()
+                return redirect('/perfil/'+str(persona_id)+'?dia='+str(fecha))
+            else: print(formImagen.errors)
     return render(request, 'perfil.html', context)
 
 def comentarios(request, persona_id):

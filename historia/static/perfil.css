@@ -86,6 +86,11 @@ button.saveIndicator{
 	visibility: hidden;
 }
 
+.hiddenn{
+	visibility: hidden;
+	position: absolute;
+}
+
 .widthBoton{
 	width: 11em;
 }

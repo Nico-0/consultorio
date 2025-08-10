@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import socket
+import qrcode
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 # append local ip, works for the first network adapter, disable virtual adapters
-ALLOWED_HOSTS.append(socket.gethostbyname(socket.gethostname()))
+localip = socket.gethostbyname(socket.gethostname())
+ALLOWED_HOSTS.append(localip)
+qrimg = qrcode.make('http://'+localip+':8000')
+qrimg.save("historia/static/qrip.png")
 
 # Custom settings
 DRIVE_FOLDER_ID = ""
@@ -122,6 +126,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = "files/"
+
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

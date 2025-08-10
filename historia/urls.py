@@ -12,3 +12,9 @@ urlpatterns = [
     path('perfil/<int:persona_id>/entrada', views.entrada, name='entrada'),
     path('perfil/<int:persona_id>/activo', views.activo, name='activo'),
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, 
+                    document_root=settings.MEDIA_ROOT)
