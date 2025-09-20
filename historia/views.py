@@ -14,12 +14,15 @@ from django.utils import timezone, dateparse
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 import os
 import requests
 from PIL import Image
 from django.core.files.base import ContentFile
 from io import BytesIO
+ITEMS_PER_PAGE = 8
 
 def about(request):
     import subprocess
@@ -97,8 +100,45 @@ def consultorio(request):
     context['title'] = 'Consultorio'
     context['css'] = 'consultorio.css'
     context['js'] = 'consultorio.js'
-    context['active'] = True
-    context['personas'] = Persona.objects.filter(activo=True)
+    context['activeA'] = True
+    showActive = 'hidden' not in request.GET
+    context['filterActive'] = showActive
+
+    filters = Q(activo=showActive)
+    if 'search' in request.GET:
+        searchParam = request.GET.get('search')
+        context['search'] = searchParam
+        terms = searchParam.strip().split()
+
+        # Build AND of ORs: each word must be in any field
+        for term in terms:
+            filters &= (
+                Q(nombre__icontains=term) | Q(apellido__icontains=term) | Q(dni__icontains=term) | Q(nacimiento__icontains=term) |
+                Q(obraSocial__icontains=term) | Q(obraSocial2__icontains=term) | Q(afiliado__icontains=term) | Q(afiliado2__icontains=term) |
+                Q(telefono__icontains=term) | Q(localidad__icontains=term) | Q(email__icontains=term) | Q(extras__icontains=term)
+            )
+
+    personas = Persona.objects.filter(filters)
+    if 'order' in request.GET:
+        personas = personas.order_by(request.GET.get('order'))
+    paginator = Paginator(personas, ITEMS_PER_PAGE)
+    pageNumber = request.GET.get('page')
+
+    try: 
+        paginatedPersonas = paginator.page(pageNumber)
+        pageNumber = int(pageNumber)
+    except PageNotAnInteger: 
+        pageNumber = 1
+        paginatedPersonas = paginator.page(pageNumber)
+    except EmptyPage: 
+        pageNumber = paginator.num_pages if int(pageNumber) > paginator.num_pages else 1
+        paginatedPersonas = paginator.page(pageNumber)
+
+    context['personas'] = paginatedPersonas
+    context['page'] = {"num" : pageNumber, "total" : paginator.num_pages, "prev" : pageNumber-1, "next" : pageNumber+1, "itemcount" : paginator.count}
+    currentParams = request.GET.copy()
+    currentParams.pop('page', None)
+    context['currentParams'] = currentParams.urlencode()
     context['form'] = PacienteForm()
     if request.method == 'POST':
         if 'cargar' in request.POST:
@@ -138,8 +178,6 @@ def perfil(request, persona_id):
     context['js'] = 'perfil.js'
     persona = get_object_or_404(Persona, id=persona_id)
     context['persona'] = persona
-    entradas = persona.entrada_set.all().prefetch_related('imagenes')
-    context['entradas'] = entradas
     diaHoy = timezone.localdate()
     context['edadHoy'] = relativedelta(diaHoy, persona.nacimiento).years
     context['diaHoy'] = diaHoy
@@ -149,6 +187,26 @@ def perfil(request, persona_id):
     context['diaElegido'] = diaElegido
     context['entradaElegida'] = entradaElegida
     context['imagenes'] = Imagen.objects.filter(entrada=entradaElegida)
+
+    entradas = persona.entrada_set.all().prefetch_related('imagenes')
+    paginator = Paginator(entradas, ITEMS_PER_PAGE)
+    pageNumber = request.GET.get('page')
+
+    try: 
+        paginatedEntradas = paginator.page(pageNumber)
+        pageNumber = int(pageNumber)
+    except PageNotAnInteger: 
+        pageNumber = 1
+        paginatedEntradas = paginator.page(pageNumber)
+    except EmptyPage: 
+        pageNumber = paginator.num_pages if int(pageNumber) > paginator.num_pages else 1
+        paginatedEntradas = paginator.page(pageNumber)
+
+    context['entradas'] = paginatedEntradas
+    context['page'] = {"num" : pageNumber, "total" : paginator.num_pages, "prev" : pageNumber-1, "next" : pageNumber+1, "itemcount" : paginator.count}
+    currentParams = request.GET.copy()
+    currentParams.pop('page', None)
+    context['currentParams'] = currentParams.urlencode()
 
     context['form'] = PacienteFullForm(instance=persona)
     if request.method == 'POST':
@@ -172,6 +230,7 @@ def perfil(request, persona_id):
                 # process image
                 uploaded_img = request.FILES['imagen']
                 img = Image.open(uploaded_img)
+                img = img.convert('RGB')
                 img.thumbnail((1024, 1024)) #max_size
                 img_io = BytesIO()
                 img.save(img_io, format='JPEG', quality=75, optimize=True)

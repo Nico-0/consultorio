@@ -29,8 +29,7 @@
 	border: 2px solid;
 	border-color:firebrick;
 	border-radius: 8px;
-	width:100%;
-	max-width: 500px;
+	min-width: 500px;
 	cursor: pointer;
 	text-decoration: none;
 	color: black;
@@ -39,6 +38,14 @@
 .paciente:hover{
 
 	background-color:floralwhite;
+}
+
+p b {
+	font-weight: 500;
+}
+
+#buscador{
+	max-width: 500px;
 }
 
 .titulo{

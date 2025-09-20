@@ -17,7 +17,7 @@
           </a>
     
           <ul class="nav nav-pills">
-            <li class="nav-item"><a href="{% url 'consultorio' %}" class="nav-link {% if active %}active{% endif %}" {% if active %}aria-current="page"{% endif %}>Pacientes</a></li>
+            <li class="nav-item"><a href="{% url 'consultorio' %}" class="nav-link {% if activeA %}active{% endif %}" {% if active %}aria-current="page"{% endif %}>Pacientes</a></li>
             <li class="nav-item"><a href="{% url 'backups' %}" class="nav-link {% if activeB %}active{% endif %}" {% if activeB %}aria-current="page"{% endif %}>Backups</a></li>
             <li class="nav-item"><a href="{% url 'about' %}" class="nav-link {% if activeC %}active{% endif %}" {% if activeC %}aria-current="page"{% endif %}>About</a></li>
           </ul>

@@ -13,10 +13,11 @@
 		</button>
 		<ul class="dropdown-menu">
 		  <li><h6 class="dropdown-header">Ordenar pacientes</h6></li>
-		  <li><a class="dropdown-item" href="#">Por nombre</a></li>
-		  <li><a class="dropdown-item" href="#">Por edad</a></li>
+		  <li><a class="dropdown-item" href="/?order=apellido">Por apellido</a></li>
+		  <li><a class="dropdown-item" href="/?order=dni">Por DNI</a></li>
+		  <li><a class="dropdown-item" href="/?order=nacimiento">Por edad</a></li>
 		  <li><hr class="dropdown-divider"></li>
-		  <li><a class="dropdown-item" href="#">Mostrar desactivados</a></li>
+		  <li><a class="dropdown-item" href="/{% if filterActive %}?hidden=true{% endif %}">Mostrar {% if filterActive %}des{% endif %}activados</a></li>
 		</ul>
       </div>
 	</div>
@@ -27,25 +28,45 @@
 		<button class="btn btn-outline-success" name="cargar">Cargar</button>
 	</form>
 
+	<input type="text" class="form-control" id="buscador" autofocus value="{{ search }}" onfocus="var temp_value=this.value; this.value=''; this.value=temp_value">
+
 	<div class="d-flex flex-column mb-3 lista align-items-center">
+		<span>{{page.itemcount}} pacientes {% if not filterActive %}ocultos{% endif %} {% if search %}filtrados{% endif %}</span>
 		{% for persona in personas %}
 		<a class="p-2 paciente" href="{% url 'perfil' persona.id %}">
 			<p class="titulo" style="text-align: center;">{{ persona.apellido }}, {{ persona.nombre }}</p>
-			<p>DNI: {{ persona.dni }}</p>
-			<p>Nacimiento: {{ persona.nacimiento }}</p>
-			<p>Obra Social: {{ persona.obraSocial }}</p>
+			<div class="d-flex flex-column flex-wrap column-gap-2" style="max-height: 120px;">
+				<p><b>Nacimiento</b>: {{ persona.nacimiento }}</p>
+				{% if persona.dni %}<p><b>DNI</b>: {{ persona.dni }}</p>{% endif %}
+				{% if persona.obraSocial %}<p><b>Obra Social</b>: {{ persona.obraSocial }}</p>{% endif %}
+				{% if persona.obraSocial2 %}<p><b>Obra Social 2</b>: {{ persona.obraSocial2 }}</p>{% endif %}
+				{% if persona.afiliado %}<p><b>Afiliado</b>: {{ persona.afiliado }}</p>{% endif %}
+				{% if persona.afiliado2 %}<p><b>Afiliado 2</b>: {{ persona.afiliado2 }}</p>{% endif %}
+				{% if persona.telefono %}<p><b>Telefono</b>: {{ persona.telefono }}</p>{% endif %}
+				{% if persona.localidad %}<p><b>Localidad</b>: {{ persona.localidad }}</p>{% endif %}
+				{% if persona.email %}<p><b>Email</b>: {{ persona.email }}</p>{% endif %}
+				{% if persona.extras %}<p><b>Extras</b>: {{ persona.extras }}</p>{% endif %}
+			</div>
 			<p style="text-align: right; font-size: 0.7em; margin-bottom: 0;">Datos actualizados: {{ persona.modificado }}</p>
 		</a>
         {% endfor %}
 	</div>
 
-	<nav aria-label="Page navigation example" style="visibility: hidden;">
+	<nav aria-label="Page navigation">
 	  <ul class="pagination">
-		<li class="page-item"><a class="page-link" href="#">Previous</a></li>
-		<li class="page-item"><a class="page-link" href="#">1</a></li>
-		<li class="page-item"><a class="page-link" href="#">2</a></li>
-		<li class="page-item"><a class="page-link" href="#">3</a></li>
-		<li class="page-item"><a class="page-link" href="#">Next</a></li>
+		<li class="page-item {% if page.num < 2 %}disabled{% endif %}">
+			<a class="page-link" href="?{{ currentParams }}&page={{ page.prev }}" aria-label="Previous">
+				<span aria-hidden="true">&laquo;</span>
+			</a>
+		</li>
+		{% if page.num != 1 %}<li class="page-item"><a class="page-link" href="?{{ currentParams }}&page=1">1</a></li>{% endif %}
+		<li class="page-item disabled"><a class="page-link">{{ page.num }}</a></li>
+		{% if page.num != page.total %}<li class="page-item"><a class="page-link" href="?{{ currentParams }}&page={{ page.total }}">{{ page.total }}</a></li>{% endif %}
+		<li class="page-item {% if page.num >= page.total %}disabled{% endif %}">
+			<a class="page-link" href="?{{ currentParams }}&page={{ page.next }}" aria-label="Next">
+				<span aria-hidden="true">&raquo;</span>
+			</a>
+		</li>
 	  </ul>
 	</nav>
 

@@ -117,7 +117,7 @@
 						<p class="titulo">Hoy:</p>{% else %}
 						<div class="d-flex justify-content-between">
 							<p class="titulo">Dia anterior:</p>
-							<a href="/perfil/{{persona.id}}" class="btn btn-primary" style="height: 2.4em;">Volver a hoy</a>
+							<a href="/perfil/{{persona.id}}?&page={{ page.num }}" class="btn btn-primary" style="height: 2.4em;">Volver a hoy</a>
 						</div>
 						{% endif %}
 																			
@@ -147,6 +147,24 @@
 						{% endfor %}
 					</div>
 					{% endfor %}
+					<span>{{page.itemcount}} entradas</span>
+					<nav aria-label="Page navigation">
+						<ul class="pagination">
+							<li class="page-item {% if page.num < 2 %}disabled{% endif %}">
+								<a class="page-link" href="?{{ currentParams }}&page={{ page.prev }}" aria-label="Previous">
+									<span aria-hidden="true">&laquo;</span>
+								</a>
+							</li>
+							{% if page.num != 1 %}<li class="page-item"><a class="page-link" href="?{{ currentParams }}&page=1">1</a></li>{% endif %}
+							<li class="page-item disabled"><a class="page-link">{{ page.num }}</a></li>
+							{% if page.num != page.total %}<li class="page-item"><a class="page-link" href="?{{ currentParams }}&page={{ page.total }}">{{ page.total }}</a></li>{% endif %}
+							<li class="page-item {% if page.num >= page.total %}disabled{% endif %}">
+								<a class="page-link" href="?{{ currentParams }}&page={{ page.next }}" aria-label="Next">
+									<span aria-hidden="true">&raquo;</span>
+								</a>
+							</li>
+						</ul>
+					</nav>
 				
 				</div>
 

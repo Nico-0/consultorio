@@ -70,7 +70,7 @@ editDateElement.addEventListener("change", function() {
             clearTimeout(timeout3);
             timeout3 = setTimeout(() => {
             const selectedDate = this.value;
-            window.location.href = window.location.origin + window.location.pathname + `?dia=${selectedDate}`;
+            window.location.href = window.location.origin + window.location.pathname + `?dia=${selectedDate}` + `&page=${new URLSearchParams(window.location.search).get('page')}`;
             }, 1000);
         });
 
