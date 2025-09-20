@@ -18,7 +18,11 @@
     
           <ul class="nav nav-pills">
             <li class="nav-item"><a href="{% url 'consultorio' %}" class="nav-link {% if activeA %}active{% endif %}" {% if active %}aria-current="page"{% endif %}>Pacientes</a></li>
-            <li class="nav-item"><a href="{% url 'backups' %}" class="nav-link {% if activeB %}active{% endif %}" {% if activeB %}aria-current="page"{% endif %}>Backups</a></li>
+            <li class="nav-item"><a href="{% url 'backups' %}" class="nav-link {% if activeB %}active{% endif %}" {% if activeB %}aria-current="page"{% endif %}>Backups{% if not drive_session %}⚠️{% endif %}</a></li>
+            {% if not drive_session %}<li class="nav-item btn btn-danger"><form method="POST" action="/drivelogin/" id="">
+                                                                          {% csrf_token %}
+                                                                          <button type="submit" class="nav-link" style="color: white">Iniciar Sesión Drive</button>
+                                                                        </form></li>{% endif %}
             <li class="nav-item"><a href="{% url 'about' %}" class="nav-link {% if activeC %}active{% endif %}" {% if activeC %}aria-current="page"{% endif %}>About</a></li>
           </ul>
         </header>

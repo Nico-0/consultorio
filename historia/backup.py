@@ -5,8 +5,9 @@ from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
 
 #pip install pydrive
-from pydrive.auth import GoogleAuth
+from pydrive.auth import GoogleAuth, RefreshError, AuthenticationError
 from pydrive.drive import GoogleDrive
+from httplib2 import ServerNotFoundError
 from django.conf import settings
 
 import os, sys
@@ -20,7 +21,9 @@ SERVICE_ACCOUNT_FILE = 'service_account.json'
 filename = "db.sqlite3"
 mimeType = 'application/x-7z-compressed'
 BACKUP_TIMESTAMP = './last_backup.txt'
+DRIVE_LOGIN = False
 
+'''
 def authenticate():
     creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
     return creds
@@ -40,10 +43,30 @@ def upload_file_service_account():
         body=file_metadata, # nombre y carpeta
         media_body=media_body # archivo a subir
     ).execute()
+'''
 
-def upload_file(filepath):
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
+def check_creds():
+    try:
+        gauth = GoogleAuth()
+        gauth.LoadCredentialsFile("credentials.json")
+        gauth.Authorize()
+        login_completed()
+        return gauth
+    except AuthenticationError: 
+        print("No se pudo autenticar con Gdrive")
+
+def auth():
+    try:
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth() # abre ventana y bloquea el programa
+        login_completed()
+    except RefreshError:
+        os.remove("./credentials.json")
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth()
+    return gauth    
+
+def upload_file(filepath, gauth):
     drive = GoogleDrive(gauth)
 
     file_metadata = {
@@ -68,51 +91,84 @@ def get_last_backup_time():
     except FileNotFoundError:
         return None
     except Exception as e:
-        print("⚠️🚨 Error reading backup time:", e)
+        print("⚠️🚨 Error reading backup time file:", e)
         return None
 
 def rutinaBackup():
-    last_backup = get_last_backup_time()
-    delta = relativedelta(timezone.localtime(timezone.now()).replace(tzinfo=None), last_backup).days
-    print("\nUltimo backup: ", last_backup, file=sys.stderr)
-    if(delta > 2 or last_backup is None):
-        hacerBackup()
+    days_local_freq = 1
+    days_online_freq = 2
+    backupFile = None
+
+    # backup local
+    try:
+        last_backup = timezone.datetime.fromtimestamp(os.path.getmtime("backups/"))
+    except FileNotFoundError:
+        last_backup = None
+    now = timezone.localtime(timezone.now()).replace(tzinfo=None)
+    delta = relativedelta(now, last_backup).days
+    if(delta > days_local_freq or last_backup is None):
+        backupFile = backupLocal()
     else:
-        print("Dias desde el ultimo backup: ", delta, "\n", file=sys.stderr)
+        print("Dias desde el ultimo backup local: ", delta)
 
-def hacerBackup():
-    backupCompleto = True
+    # checkear el login
+    creds = check_creds()
 
+    if(creds is not None):
+        # rutina backup online
+        last_backup = get_last_backup_time()
+        delta = relativedelta(now, last_backup).days
+        print("\nUltimo backup online: ", last_backup, file=sys.stderr)
+        if(delta > days_online_freq or last_backup is None):
+            backupOnline(backupFile, creds)
+        else:
+            print("Dias desde el ultimo backup online: ", delta, "\n", file=sys.stderr)
+
+def backupLocal():
     try:
         os.makedirs('./backups/', exist_ok=True)
         compressed = shutil.make_archive('./backups/'+get_nameTime(), "zip", ".", filename)
         print("Nuevo backup local: ", compressed, file=sys.stderr)
+        return compressed
     except FileNotFoundError:
-        backupCompleto = False
-    
-    # online
+        print("FileNotFoundError en backup local")
+
+
+def backupOnline(backupFile, creds):
+    backupCompleto = False
     try:
-        upload_file(compressed)
+        if(backupFile is None):
+            backupFile = backupLocal()
+        upload_file(backupFile, creds)
+        backupCompleto = True
     except FileNotFoundError:
-        backupCompleto = False
-        print("Falta la service account key", file=sys.stderr)
+        print("FileNotFoundError", file=sys.stderr)
+    except ServerNotFoundError:
+        print("ServerNotFoundError")
     except HttpError as err:
-        backupCompleto = False
         #print(err.resp, file=sys.stderr)
         print(err.content, file=sys.stderr)
     # except ServerNotFoundError: ipconfig /flushdns
 
-
-    # si se completaron backup local + online, registrar como backup realizado
-    # falta considerar, si falla uno que no se haga el otro siempre
+    # guardar hora de ultimo backup online
     if(backupCompleto):
         with open(BACKUP_TIMESTAMP, 'w') as f:
             f.write(str(timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")))
-        print("Backup completo\n", file=sys.stderr)
+        print("Backup online completo\n", file=sys.stderr)
     else:
-        print("Error de backup\n", file=sys.stderr)
+        print("Error de backup online\n", file=sys.stderr)
     
+def forzarBackup():
+    gauth = auth()
+    backupOnline(None, gauth)
 
+def login_completed():
+    global DRIVE_LOGIN; DRIVE_LOGIN = True
+
+def session_status(request):
+    return {
+        "drive_session": DRIVE_LOGIN,
+    }
 
 
 

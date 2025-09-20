@@ -3,6 +3,14 @@
 
 <h1 class="text-center">Pacientes</h1>
 
+{% if messages %}
+	{% for message in messages %}
+		<div class="alert alert-success" role="alert">
+			{% if message.tags %}{{ message.tags }}: {% endif %}{{ message }}
+		</div>
+	{% endfor %}
+{% endif %}
+
 <div class="d-flex flex-column mb-3 padre align-items-center">
 
 	<div class="d-flex flex-row bd-highlight mb-3 botones justify-content-around">
@@ -28,7 +36,7 @@
 		<button class="btn btn-outline-success" name="cargar">Cargar</button>
 	</form>
 
-	<input type="text" class="form-control" id="buscador" autofocus value="{{ search }}" onfocus="var temp_value=this.value; this.value=''; this.value=temp_value">
+	<input type="text" class="form-control" id="buscador" autofocus value="{{ search }}" placeholder="Buscar" onfocus="var temp_value=this.value; this.value=''; this.value=temp_value">
 
 	<div class="d-flex flex-column mb-3 lista align-items-center">
 		<span>{{page.itemcount}} pacientes {% if not filterActive %}ocultos{% endif %} {% if search %}filtrados{% endif %}</span>

@@ -85,14 +85,14 @@ def backups(request):
     context['title'] = 'Backups'
     context['css'] = 'consultorio.css'
     context['activeB'] = True
-    from .backup import get_last_backup_time, hacerBackup
+    from .backup import get_last_backup_time, forzarBackup
     from django.conf import settings
     context['backups'] = "\n".join(os.listdir('./backups')[::-1])
     context['lastBackup'] = get_last_backup_time()
     context['carpeta'] = settings.DRIVE_FOLDER_ID
     if request.method == 'POST':
         if 'generar' in request.POST:
-            hacerBackup()
+            forzarBackup()
     return render(request, 'backups.html', context)
 
 def consultorio(request):
@@ -284,6 +284,14 @@ def activo(request, persona_id):
         except Persona.DoesNotExist:
             return JsonResponse({'status': 'persona not found'}, status=404)
     return redirect('/perfil/'+str(persona_id))
+
+def drivelogin(request):
+    from .backup import forzarBackup
+    if request.method == 'POST':
+        forzarBackup()
+        messages.success(request, 'Login completado')
+        return redirect('/')
+    return redirect('/')
 
 def index(request):
     context = {}
