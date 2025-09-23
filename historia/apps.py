@@ -8,6 +8,6 @@ class HistoriaConfig(AppConfig):
     def ready(self):
         print("--------------------------------------------------------------------------------------------")
         import historia.signals
-        from .backup import rutinaBackup
-        rutinaBackup()
+        from .backup import initBackup
+        initBackup()
 

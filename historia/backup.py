@@ -94,7 +94,15 @@ def get_last_backup_time():
         print("⚠️🚨 Error reading backup time file:", e)
         return None
 
-def rutinaBackup():
+def initBackup():
+    creds = check_creds()
+    rutinaBackup(creds)
+
+def checkBackup():
+    gauth = auth()
+    rutinaBackup(gauth)
+
+def rutinaBackup(creds):
     days_local_freq = 1
     days_online_freq = 2
     backupFile = None
@@ -111,8 +119,6 @@ def rutinaBackup():
     else:
         print("Dias desde el ultimo backup local: ", delta)
 
-    # checkear el login
-    creds = check_creds()
 
     if(creds is not None):
         # rutina backup online

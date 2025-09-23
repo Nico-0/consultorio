@@ -93,6 +93,7 @@ def backups(request):
     if request.method == 'POST':
         if 'generar' in request.POST:
             forzarBackup()
+            return redirect("backups")
     return render(request, 'backups.html', context)
 
 def consultorio(request):
@@ -147,11 +148,12 @@ def consultorio(request):
             # persona = form.save(commit=False)
             # persona.save()
             if not form.is_valid():
-                redirect = validar_form_dni(request, form)
-                if redirect: return redirect
+                redirectx = validar_form_dni(request, form)
+                if redirectx: return redirectx
                 #new_form = validar_form_email(request, form)
                 #if new_form.data: form = new_form
             form.save()
+            return redirect("consultorio")
     return render(request, 'consultorio.html', context)
 
 def validar_form_dni(request, form):
@@ -214,10 +216,11 @@ def perfil(request, persona_id):
         if 'cargarDatos' in request.POST:
             form = PacienteFullForm(request.POST, instance=persona)
             if not form.is_valid():
+                print(form.errors)
                 redirectx = validar_form_dni(request, form)
                 if redirectx: return redirectx
-            print(form.errors)
             form.save()
+            return redirect('/perfil/'+str(persona_id))
         if 'cargaArchivo' in request.POST:
             import pillow_heif
             pillow_heif.register_heif_opener()
@@ -304,11 +307,12 @@ def activo(request, persona_id):
     return redirect('/perfil/'+str(persona_id))
 
 def drivelogin(request):
-    from .backup import forzarBackup, auth
+    from .backup import checkBackup
     if request.method == 'POST':
-        auth()
+        # se solicita login si fallaron las creds locales
+        checkBackup() # se vuelve a llamar rutina de backup con nuevas creds
         messages.success(request, 'Login completado')
-        return redirect('/')
+        #return redirect('backups')
     return redirect('/')
 
 def index(request):
