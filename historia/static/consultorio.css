@@ -52,3 +52,21 @@ p b {
 
 	font-size: 20px;
 }
+
+.datos{
+	max-height: 120px;
+}
+
+@media (width <= 920px) {
+	div p{
+		margin-bottom: 0px;
+	}
+	.datos{
+		max-height: 150px;
+	}
+	.paciente{
+		min-width: 100px;
+		width: 500px;
+		max-width: 100%;
+	}
+}

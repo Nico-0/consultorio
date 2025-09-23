@@ -103,6 +103,20 @@ button.saveIndicator{
 	width: 58%;
 }
 
+#myinputfile{
+	width: calc(100% - 8.5em);
+	display: inline;
+}
+
+#btn-upload{
+	width: 8em;
+}
+
+.miniatura{
+	max-width: 100px;
+	max-height: 100px;
+}
+
 @media (width <= 920px) {
 	.izquierda{
 		width: 100%;

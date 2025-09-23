@@ -6,8 +6,8 @@ def index(request):
     return HttpResponse("Hello, world!")
 """
 from django.shortcuts import render
-from historia.models import Persona, Entrada, Imagen
-from historia.forms import PersonaForm, PacienteForm, PacienteFullForm, ImagenUploadForm
+from historia.models import Persona, Entrada, Imagen, Archivo
+from historia.forms import PersonaForm, PacienteForm, PacienteFullForm, ImagenUploadForm, ArchivoUploadForm
 from django.shortcuts import get_object_or_404
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone, dateparse
@@ -19,7 +19,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 import os
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from django.core.files.base import ContentFile
 from io import BytesIO
 ITEMS_PER_PAGE = 8
@@ -115,7 +115,7 @@ def consultorio(request):
             filters &= (
                 Q(nombre__icontains=term) | Q(apellido__icontains=term) | Q(dni__icontains=term) | Q(nacimiento__icontains=term) |
                 Q(obraSocial__icontains=term) | Q(obraSocial2__icontains=term) | Q(afiliado__icontains=term) | Q(afiliado2__icontains=term) |
-                Q(telefono__icontains=term) | Q(localidad__icontains=term) | Q(email__icontains=term) | Q(extras__icontains=term)
+                Q(telefono__icontains=term) | Q(localidad__icontains=term) | Q(email__icontains=term) | Q(ocupacion__icontains=term)
             )
 
     personas = Persona.objects.filter(filters)
@@ -187,6 +187,7 @@ def perfil(request, persona_id):
     context['diaElegido'] = diaElegido
     context['entradaElegida'] = entradaElegida
     context['imagenes'] = Imagen.objects.filter(entrada=entradaElegida)
+    context['archivos'] = Archivo.objects.filter(entrada=entradaElegida)
 
     entradas = persona.entrada_set.all().prefetch_related('imagenes')
     paginator = Paginator(entradas, ITEMS_PER_PAGE)
@@ -217,29 +218,46 @@ def perfil(request, persona_id):
                 if redirectx: return redirectx
             print(form.errors)
             form.save()
-        if 'cargaImagen' in request.POST:
+        if 'cargaArchivo' in request.POST:
             import pillow_heif
             pillow_heif.register_heif_opener()
-            formImagen = ImagenUploadForm(request.POST, request.FILES)
-            if formImagen.is_valid():
-                fecha = formImagen.cleaned_data['fecha'] # en caso de querer subir una imagen para una entrada inexistente, no existe su id, entonces se trae la fecha
-                entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=fecha, defaults={"comentarios": ""})
-                imagen = formImagen.save(commit=False)
-                imagen.entrada = entrada
-                
-                # process image
-                uploaded_img = request.FILES['imagen']
-                img = Image.open(uploaded_img)
-                img = img.convert('RGB')
-                img.thumbnail((1024, 1024)) #max_size
-                img_io = BytesIO()
-                img.save(img_io, format='JPEG', quality=75, optimize=True)
-                img_content = ContentFile(img_io.getvalue(), name=f"{uploaded_img.name.rsplit('.', 1)[0]}.jpg")
-                imagen.imagen = img_content             
+            uploaded_file = request.FILES['archivo']
+            base, ext = os.path.splitext(uploaded_file.name)
+            uploaded_file.name = base[:95] + ext
+            #print(uploaded_file.content_type, uploaded_file.size)
+            try:
+                img = Image.open(uploaded_file) # detecta si es imagen
+                uploaded_file.seek(0)
+                formImagen = ImagenUploadForm(request.POST, request.FILES)
+                if formImagen.is_valid():
+                    fecha = formImagen.cleaned_data['fecha'] # en caso de querer subir una imagen para una entrada inexistente, no existe su id, entonces se trae la fecha
+                    entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=fecha, defaults={"comentarios": ""})
+                    imagen = formImagen.save(commit=False)
+                    imagen.entrada = entrada
+                    
+                    # process image
+                    img = img.convert('RGB')
+                    img.thumbnail((1024, 1024)) #max_size
+                    img_io = BytesIO()
+                    img.save(img_io, format='JPEG', quality=75, optimize=True)
+                    img_content = ContentFile(img_io.getvalue(), name=f"{uploaded_file.name.rsplit('.', 1)[0]}.jpg")
+                    imagen.imagen = img_content             
 
-                imagen.save()
-                return redirect('/perfil/'+str(persona_id)+'?dia='+str(fecha))
-            else: print(formImagen.errors)
+                    imagen.save()
+                    return redirect('/perfil/'+str(persona_id)+'?dia='+str(fecha))
+                else: print(formImagen.errors); messages.error(request, formImagen.errors)
+            except UnidentifiedImageError: # es otro archivo
+                formArchivo = ArchivoUploadForm(request.POST, request.FILES)
+                if formArchivo.is_valid():
+                    fecha = formArchivo.cleaned_data['fecha']
+                    entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=fecha, defaults={"comentarios": ""})
+                    archivo = formArchivo.save(commit=False)
+                    archivo.entrada = entrada
+                    archivo.save()
+                    return redirect('/perfil/'+str(persona_id)+'?dia='+str(fecha))
+                else: print(formArchivo.errors); messages.error(request, formArchivo.errors)
+
+
     return render(request, 'perfil.html', context)
 
 def comentarios(request, persona_id):
@@ -286,9 +304,9 @@ def activo(request, persona_id):
     return redirect('/perfil/'+str(persona_id))
 
 def drivelogin(request):
-    from .backup import forzarBackup
+    from .backup import forzarBackup, auth
     if request.method == 'POST':
-        forzarBackup()
+        auth()
         messages.success(request, 'Login completado')
         return redirect('/')
     return redirect('/')

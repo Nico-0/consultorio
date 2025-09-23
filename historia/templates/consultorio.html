@@ -43,9 +43,10 @@
 		{% for persona in personas %}
 		<a class="p-2 paciente" href="{% url 'perfil' persona.id %}">
 			<p class="titulo" style="text-align: center;">{{ persona.apellido }}, {{ persona.nombre }}</p>
-			<div class="d-flex flex-column flex-wrap column-gap-2" style="max-height: 120px;">
+			<div class="d-flex flex-column flex-wrap column-gap-2 datos">
 				<p><b>Nacimiento</b>: {{ persona.nacimiento }}</p>
 				{% if persona.dni %}<p><b>DNI</b>: {{ persona.dni }}</p>{% endif %}
+				{% if persona.sexo %}<p><b>Sexo</b>: {{ persona.sexo }}</p>{% endif %}
 				{% if persona.obraSocial %}<p><b>Obra Social</b>: {{ persona.obraSocial }}</p>{% endif %}
 				{% if persona.obraSocial2 %}<p><b>Obra Social 2</b>: {{ persona.obraSocial2 }}</p>{% endif %}
 				{% if persona.afiliado %}<p><b>Afiliado</b>: {{ persona.afiliado }}</p>{% endif %}
@@ -53,6 +54,7 @@
 				{% if persona.telefono %}<p><b>Telefono</b>: {{ persona.telefono }}</p>{% endif %}
 				{% if persona.localidad %}<p><b>Localidad</b>: {{ persona.localidad }}</p>{% endif %}
 				{% if persona.email %}<p><b>Email</b>: {{ persona.email }}</p>{% endif %}
+				{% if persona.ocupacion %}<p><b>Ocupacion</b>: {{ persona.ocupacion }}</p>{% endif %}
 				{% if persona.extras %}<p><b>Extras</b>: {{ persona.extras }}</p>{% endif %}
 			</div>
 			<p style="text-align: right; font-size: 0.7em; margin-bottom: 0;">Datos actualizados: {{ persona.modificado }}</p>
