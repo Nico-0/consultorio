@@ -7,3 +7,4 @@ client_secrets*.json
 credentials.json
 media/
 historia/static/qrip.png
+drive_folder_id.txt

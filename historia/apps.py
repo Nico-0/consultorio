@@ -8,6 +8,7 @@ class HistoriaConfig(AppConfig):
     def ready(self):
         print("--------------------------------------------------------------------------------------------")
         import historia.signals
-        from .backup import initBackup
+        from .backup import initBackup, get_set_drive_folder
+        get_set_drive_folder()
         initBackup()
 

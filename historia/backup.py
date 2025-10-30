@@ -7,20 +7,24 @@ from google.oauth2 import service_account
 #pip install pydrive
 from pydrive.auth import GoogleAuth, RefreshError, AuthenticationError
 from pydrive.drive import GoogleDrive
+from pydrive.files import ApiRequestError
 from httplib2 import ServerNotFoundError
 from django.conf import settings
+from .exceptions import GApiReqError
 
 import os, sys
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from dateutil.relativedelta import relativedelta
 import shutil
+import json
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = 'service_account.json'
 filename = "db.sqlite3"
 mimeType = 'application/x-7z-compressed'
-BACKUP_TIMESTAMP = './last_backup.txt'
+BACKUP_TIMESTAMP_FILE = './last_backup.txt'
+DRIVE_FOLDER_ID_FILE = './drive_folder_id.txt'
 DRIVE_LOGIN = False
 
 '''
@@ -50,7 +54,6 @@ def check_creds():
         gauth = GoogleAuth()
         gauth.LoadCredentialsFile("credentials.json")
         gauth.Authorize()
-        login_completed()
         return gauth
     except AuthenticationError: 
         print("No se pudo autenticar con Gdrive")
@@ -59,7 +62,6 @@ def auth():
     try:
         gauth = GoogleAuth()
         gauth.LocalWebserverAuth() # abre ventana y bloquea el programa
-        login_completed()
     except RefreshError:
         os.remove("./credentials.json")
         gauth = GoogleAuth()
@@ -86,17 +88,28 @@ def get_nameTime():
 
 def get_last_backup_time():
     try:
-        with open(BACKUP_TIMESTAMP, 'r') as f:
+        with open(BACKUP_TIMESTAMP_FILE, 'r') as f:
             return parse_datetime(f.read().strip())
     except FileNotFoundError:
         return None
     except Exception as e:
         print("⚠️🚨 Error reading backup time file:", e)
         return None
+    
+def get_set_drive_folder():
+    try:
+        with open(DRIVE_FOLDER_ID_FILE, 'r') as f:
+            settings.DRIVE_FOLDER_ID = f.read().strip()
+    except:
+        #can be set directly from settings instead
+        pass
 
 def initBackup():
     creds = check_creds()
-    rutinaBackup(creds)
+    try:
+        rutinaBackup(creds)
+    except (GApiReqError, ServerNotFoundError) as e:
+        print(e)
 
 def checkBackup():
     gauth = auth()
@@ -128,6 +141,7 @@ def rutinaBackup(creds):
         if(delta > days_online_freq or last_backup is None):
             backupOnline(backupFile, creds)
         else:
+            login_completed()
             print("Dias desde el ultimo backup online: ", delta, "\n", file=sys.stderr)
 
 def backupLocal():
@@ -147,18 +161,20 @@ def backupOnline(backupFile, creds):
             backupFile = backupLocal()
         upload_file(backupFile, creds)
         backupCompleto = True
+        login_completed()
     except FileNotFoundError:
         print("FileNotFoundError", file=sys.stderr)
-    except ServerNotFoundError:
-        print("ServerNotFoundError")
+    #except ServerNotFoundError as e: # ipconfig /flushdns
     except HttpError as err:
         #print(err.resp, file=sys.stderr)
         print(err.content, file=sys.stderr)
-    # except ServerNotFoundError: ipconfig /flushdns
+    except ApiRequestError as e:
+        raise GApiReqError(json.loads(e.args[0].content.decode("utf-8"))["error"]["message"])
+    
 
     # guardar hora de ultimo backup online
     if(backupCompleto):
-        with open(BACKUP_TIMESTAMP, 'w') as f:
+        with open(BACKUP_TIMESTAMP_FILE, 'w') as f:
             f.write(str(timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")))
         print("Backup online completo\n", file=sys.stderr)
     else:
@@ -166,7 +182,10 @@ def backupOnline(backupFile, creds):
     
 def forzarBackup():
     gauth = auth()
-    backupOnline(None, gauth)
+    try:
+        backupOnline(None, gauth)
+    except (GApiReqError, ServerNotFoundError) as e:
+        print(e)
 
 def login_completed():
     global DRIVE_LOGIN; DRIVE_LOGIN = True

@@ -308,10 +308,17 @@ def activo(request, persona_id):
 
 def drivelogin(request):
     from .backup import checkBackup
+    from .exceptions import GApiReqError
+    from httplib2 import ServerNotFoundError
     if request.method == 'POST':
         # se solicita login si fallaron las creds locales
-        checkBackup() # se vuelve a llamar rutina de backup con nuevas creds
-        messages.success(request, 'Login completado')
+        # se vuelve a llamar rutina de backup con nuevas creds
+        try:
+            checkBackup() 
+            messages.success(request, 'Login completado')
+        except (GApiReqError, ServerNotFoundError) as e:
+            messages.warning(request, e)
+        
         #return redirect('backups')
     return redirect('/')
 
