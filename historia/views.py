@@ -7,7 +7,7 @@ def index(request):
 """
 from django.shortcuts import render
 from historia.models import Persona, Entrada, Imagen, Archivo
-from historia.forms import PersonaForm, PacienteForm, PacienteFullForm, ImagenUploadForm, ArchivoUploadForm
+from historia.forms import PersonaForm, PacienteForm, PacienteFullForm, ImagenUploadForm, ArchivoUploadForm, OpticaExamForm
 from django.shortcuts import get_object_or_404
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone, dateparse
@@ -191,6 +191,9 @@ def perfil(request, persona_id):
     context['imagenes'] = Imagen.objects.filter(entrada=entradaElegida)
     context['archivos'] = Archivo.objects.filter(entrada=entradaElegida)
 
+    optica_form = OpticaExamForm(instance=entradaElegida)
+    context['optica_form'] = optica_form
+
     entradas = persona.entrada_set.all().prefetch_related('imagenes')
     paginator = Paginator(entradas, ITEMS_PER_PAGE)
     pageNumber = request.GET.get('page')
@@ -221,6 +224,14 @@ def perfil(request, persona_id):
                 if redirectx: return redirectx
             form.save()
             return redirect('/perfil/'+str(persona_id))
+        if 'cargaOptica' in request.POST:
+            optica_form = OpticaExamForm(request.POST, instance=entradaElegida)
+            if optica_form.is_valid():
+                optica_exam = optica_form.save(commit=False)
+                optica_exam.paciente = persona
+                optica_exam.fecha = diaElegido
+                optica_exam.save()
+                return redirect('/perfil/'+str(persona_id)+'?dia='+str(diaElegido))
         if 'cargaArchivo' in request.POST:
             import pillow_heif
             pillow_heif.register_heif_opener()

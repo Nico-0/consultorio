@@ -45,6 +45,22 @@ class Entrada(models.Model):
     fecha = models.DateField(default=timezone.now)
     comentarios = models.TextField(blank=True, default="")
 
+    motivo_consulta = models.TextField(blank=True)
+    medicamentos = models.TextField(blank=True)
+    antec_medicos = models.TextField(blank=True)
+    antec_oculares = models.TextField(blank=True)
+    obs_segmento = models.TextField(blank=True)
+    obs_generales = models.TextField(blank=True)
+
+    akr = models.JSONField(default=dict, blank=True)
+    av_sc = models.JSONField(default=dict, blank=True)
+    av_cc = models.JSONField(default=dict, blank=True)
+    retinoscopia = models.JSONField(default=dict, blank=True)
+    subjetivo = models.JSONField(default=dict, blank=True)
+    add = models.JSONField(default=dict, blank=True)
+    formula = models.JSONField(default=dict, blank=True)
+
+
     def __str__(self):
         return "Entrada " + str(self.fecha)
 
