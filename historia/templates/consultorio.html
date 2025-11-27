@@ -30,10 +30,10 @@
       </div>
 	</div>
 
-	<form method="POST" action="/" id="cargaPaciente" style="visibility: hidden; position: absolute">
+	<form method="POST" action="/" id="cargaPaciente" class="nuevoPaciente d-flex flex-wrap gap-2" style="visibility: hidden; position: absolute">
 		{% csrf_token %}
 		{{ form }}
-		<button class="btn btn-outline-success" name="cargar">Cargar</button>
+		<button class="btn btn-outline-success w-100" name="cargar">Cargar</button>
 	</form>
 
 	<input type="text" class="form-control" id="buscador" autofocus value="{{ search }}" placeholder="Buscar" onfocus="var temp_value=this.value; this.value=''; this.value=temp_value">

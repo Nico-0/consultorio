@@ -78,3 +78,12 @@ function copiarDatos() {
     navigator.clipboard.writeText('datos');
 }
 
+const toggleExtraElement = document.getElementById("togglerVer");
+toggleExtraElement.addEventListener("click", toggle('extraFields'));
+toggleExtraElement.addEventListener("click", function(){
+    const visible = this.dataset.visible === "true";
+    this.textContent = visible ? "Ver más ▼" : "Ver menos ▲";
+    this.dataset.visible = String(!visible);
+});
+
+

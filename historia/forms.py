@@ -10,18 +10,29 @@ class PersonaForm(forms.ModelForm):
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Persona
-        fields = ['apellido', 'nombre', 'nacimiento', 'dni', 'sexo', 'obraSocial', 'afiliado', 'email']
+        fields = ['apellido', 'nombre', 'dni', 'email', 'nacimiento', 'sexo']
         widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            current_classes = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f'{current_classes} form-control'
         
 class PacienteFullForm(forms.ModelForm):
     class Meta:
         model = Persona
-        fields = ['apellido', 'nombre', 'nacimiento', 'dni', 'sexo', 'obraSocial', 'afiliado', 'obraSocial2', 'afiliado2',
-                   'email', 'telefono', 'localidad', 'sangre', 'peso', 'altura', 'ocupacion', 'extras']
+        fields = ['apellido', 'nombre', 'dni', 'email', 'nacimiento', 'sexo', 'localidad', 'ocupacion', 'telefono', 'sangre',
+                   'obraSocial', 'afiliado', 'obraSocial2', 'afiliado2',
+                    'peso', 'altura', 'extras']
         widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
                    'peso': forms.NumberInput(attrs={'min': 0, 'max': '999'}),
                    'altura': forms.NumberInput(attrs={'min': 0, 'max': '9'}) # 'class': 'form-control'
                    }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            current_classes = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f'{current_classes} form-control'
 
 class OpticaExamForm(forms.ModelForm):
 
@@ -91,6 +102,9 @@ class OpticaExamForm(forms.ModelForm):
             self.fields["formula_lej_oi"].initial = formula.get("lejos_OI", "")
             self.fields["formula_cer_od"].initial = formula.get("cerca_OD", "")
             self.fields["formula_cer_oi"].initial = formula.get("cerca_OI", "")
+        for name, field in self.fields.items():
+            current_classes = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f'{current_classes} form-control cajita'
 
     def clean(self):
         cleaned = super().clean()

@@ -29,10 +29,10 @@
 			</div>
 			<div class="d-flex flex-column mb-3 padre align-items-center">
 				<div class="p-2 paciente">
-					<form method="POST" action="/perfil/{{persona.id}}" id="cargaDatos" style="visibility: hidden; position: absolute">
+					<form method="POST" action="/perfil/{{persona.id}}" id="cargaDatos" class="d-flex flex-wrap gap-2" style="visibility: hidden; position: absolute">
 						{% csrf_token %}
-						{{ form.as_p }}
-						<button class="btn btn-success" name="cargarDatos">Cargar</button>
+						{{ form }}
+						<button class="btn btn-success w-25" name="cargarDatos">Cargar</button>
 					</form>
 					<fieldset disabled id="displayDatos">
 						<div class="p-2">
@@ -54,27 +54,6 @@
 						</div>
 						<div class="d-flex flex-row"> 
 							<div class="p-2">
-								<label for="obra" class="form-label">Obra social:</label>
-								<input type="text" class="form-control " value="{{ persona.obraSocial }}" id="obra">
-							</div>
-							<div class="p-2">
-								<label for="afiliado" class="form-label">Número de afiliado:</label>
-								<input type="text" class="form-control " value="{{ persona.afiliado }}" id="afiliado">
-							</div>
-						</div>
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
-								<label for="obra2" class="form-label">Obra social 2:</label>
-								<input type="text" class="form-control " value="{{ persona.obraSocial2 }}" id="obra2">
-							</div>
-							<div class="p-2">
-								<label for="afiliado2" class="form-label">Número de afiliado 2:</label>
-								<input type="text" class="form-control " value="{{ persona.afiliado2 }}" id="afiliado2">
-							</div>
-						</div>
-						
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
 								<label for="tel" class="form-label">Teléfono:</label>
 								<input type="text" class="form-control " value="{{ persona.telefono }}" id="tel">
 							</div>
@@ -85,36 +64,58 @@
 						</div>
 						<div class="d-flex flex-row"> 
 							<div class="p-2">
-								<label for="peso" class="form-label">Peso:</label>
-								<input type="number" class="form-control " value="{{ persona.peso|stringformat:".2f" }}" id="peso">
-							</div>
-							<div class="p-2">
-								<label for="altura" class="form-label">Altura:</label>
-								<input type="number" class="form-control " value="{{ persona.altura|stringformat:".2f" }}" id="altura">
-							</div>
-						</div>
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
 								<label for="localidad" class="form-label">Localidad:</label>
 								<input type="text" class="form-control " value="{{ persona.localidad }}" id="localidad">
 							</div>
 							<div class="p-2">
-								<label for="extra" class="form-label">Dato extra:</label>
-								<input type="text" class="form-control " value="{{ persona.extras }}" id="extra">
-							</div>
-						</div>
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
 								<label for="ocupacion" class="form-label">Ocupacion:</label>
 								<input type="number" class="form-control " value="{{ persona.ocupacion }}" id="ocupacion">
 							</div>
-							<div class="p-2">
-								<label for="grupo" class="form-label">Grupo:</label>
-								<input type="text" class="form-control w-50" value="{{ persona.sangre }}" id="sangre">
+						</div>
+						<div id="extraFields" style="visibility: hidden; position: absolute">
+							<div class="d-flex flex-row"> 
+								<div class="p-2">
+									<label for="obra" class="form-label">Obra social:</label>
+									<input type="text" class="form-control " value="{{ persona.obraSocial }}" id="obra">
+								</div>
+								<div class="p-2">
+									<label for="afiliado" class="form-label">Número de afiliado:</label>
+									<input type="text" class="form-control " value="{{ persona.afiliado }}" id="afiliado">
+								</div>
+							</div>
+							<div class="d-flex flex-row"> 
+								<div class="p-2">
+									<label for="obra2" class="form-label">Obra social 2:</label>
+									<input type="text" class="form-control " value="{{ persona.obraSocial2 }}" id="obra2">
+								</div>
+								<div class="p-2">
+									<label for="afiliado2" class="form-label">Número de afiliado 2:</label>
+									<input type="text" class="form-control " value="{{ persona.afiliado2 }}" id="afiliado2">
+								</div>
+							</div>
+							<div class="d-flex flex-row"> 
+								<div class="p-2">
+									<label for="peso" class="form-label">Peso:</label>
+									<input type="number" class="form-control " value="{{ persona.peso|stringformat:".2f" }}" id="peso">
+								</div>
+								<div class="p-2">
+									<label for="altura" class="form-label">Altura:</label>
+									<input type="number" class="form-control " value="{{ persona.altura|stringformat:".2f" }}" id="altura">
+								</div>
+							</div>
+							<div class="d-flex flex-row"> 
+								<div class="p-2">
+									<label for="extra" class="form-label">Dato extra:</label>
+									<input type="text" class="form-control " value="{{ persona.extras }}" id="extra">
+								</div>
+								<div class="p-2">
+									<label for="grupo" class="form-label">Grupo sanguíneo:</label>
+									<input type="text" class="form-control w-50" value="{{ persona.sangre }}" id="sangre">
+								</div>
 							</div>
 						</div>
+						<div id="togglerVer" >Ver más ▼</div>
 					</fieldset>
-
 					<button type="button" class="btn btn-outline-secondary float-end" placeholder="Copiar datos"></button>
 				</div>
 				<div class="p-2 paciente">
@@ -154,51 +155,82 @@
 
 						<form method="post">
 							{% csrf_token %}
-							<label>Motivo consulta</label>{{ optica_form.motivo_consulta }}
-							<label>Medicamentos</label>{{ optica_form.medicamentos }}
-							<label>Antecedentes médicos </label>{{ optica_form.antec_medicos }}<label>Antecedentes oculares </label>{{ optica_form.antec_oculares }}
-							<hr />
-							<div class="dflex gap-2 mb-2">
-								<label>AKR OD </label>{{ optica_form.akr_od }}
-								<label>OI </label>{{ optica_form.akr_oi }}
-							</div><hr />
-							<div class="dflex gap-2 mb-2">
-								<label>AV/SC OD</label>{{ optica_form.av_sc_od }}
-								<label>OI</label>{{ optica_form.av_sc_oi }}
-								<label>AO</label>{{ optica_form.av_sc_ao }}
-							</div><hr />
-							<div class="dflex gap-2 mb-2">
-								<label>AV/CC OD</label>{{ optica_form.av_cc_od }}
-								<label>OI</label>{{ optica_form.av_cc_oi }}
-								<label>AO</label>{{ optica_form.av_cc_ao }}
-							</div><hr />
-							<label>Observaciones segmento anterior y posterior </label>{{ optica_form.obs_segmento }}<hr />
-							<div class="dflex gap-2 mb-2">
-								<label>Retinoscopia OD</label>{{ optica_form.retinoscopia_od }}
-								<label>OI</label>{{ optica_form.retinoscopia_oi }}
-							</div><hr />
-							<div class="dflex gap-2 mb-2">
-								<label>Subjetivo / afinación OD</label>{{ optica_form.subjetivo_od }}
-								<label>AV OD</label>{{ optica_form.subjetivo_av_od }}
-								<label>OI</label>{{ optica_form.subjetivo_oi }}
-								<label>AV OI</label>{{ optica_form.subjetivo_av_oi }}
-								<label>AV AO</label>{{ optica_form.subjetivo_av_ao }}
-							</div><hr />
-							<div class="dflex gap-2 mb-2">
-								<label>ADD OD</label>{{ optica_form.add_od }}
-								<label>OI</label>{{ optica_form.add_oi }}
-							</div><hr />
-							<div class="dflex gap-2 mb-2">
-								<label>Formula final Lejos OD</label>{{ optica_form.formula_lej_od }}
-								<label>Lejos OI</label>{{ optica_form.formula_lej_oi }}
-								<label>Cerca OD</label>{{ optica_form.formula_cer_od }}
-								<label>Cerca OI</label>{{ optica_form.formula_cer_oi }}
-							</div><hr />
-							<label>Observaciones generales y remisiones </label>{{ optica_form.obs_generales }}<hr />
-							<button type="submit" name="cargaOptica">Save</button>
+							<div class="w-100 pb-2"><label class="label-1 p-1">Motivo consulta</label>{{ optica_form.motivo_consulta }}</div>
+							<div class="w-100 pb-2"><label class="label-1 p-1">Medicamentos</label>{{ optica_form.medicamentos }}</div>
+							<div class="w-100 pb-2"><label class="label-1 p-1">Antecedentes médicos </label>{{ optica_form.antec_medicos }}</div>
+							<div class="w-100 pb-1"><label class="label-1 p-1">Antecedentes oculares </label>{{ optica_form.antec_oculares }}</div>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>AKR </legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD </label>{{ optica_form.akr_od }}
+									<label class="label-2 p-1">OI </label>{{ optica_form.akr_oi }}
+								</div>
+								<i>Dos curvaturas?</i>
+							</fieldset>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>AV/SC</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.av_sc_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.av_sc_oi }}
+									<label class="label-2 p-1">AO</label>{{ optica_form.av_sc_ao }}
+								</div>
+							</fieldset>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>AV/CC en uso</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.av_cc_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.av_cc_oi }}
+									<label class="label-2 p-1">AO</label>{{ optica_form.av_cc_ao }}
+								</div>
+							</fieldset>
+							<div class="w-100 mt-2 mb-1"><label class="label-1-doble p-1">Observaciones segmento anterior y posterior</label>{{ optica_form.obs_segmento }}</div>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>Retinoscopia</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.retinoscopia_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.retinoscopia_oi }}
+								</div>
+							</fieldset>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>Subjetivo / afinación</legend>
+								<div class="w-100 d-flex align-items-center" id="subjetivo">
+									<div class="flex-fill">
+										<div class="w-100 pb-2"><label class="label-1 p-1">OD</label>{{ optica_form.subjetivo_od }}</div>
+										<div class="w-100"><label class="label-1 p-1">OI</label>{{ optica_form.subjetivo_oi }}</div>
+									</div>
+									<div class="flex-fill">
+										<div class="w-100 pb-2"><label class="label-1 p-1">AV OD</label>{{ optica_form.subjetivo_av_od }}</div>
+										<div class="w-100"><label class="label-1 p-1">AV OI</label>{{ optica_form.subjetivo_av_oi }}</div>
+									</div>
+									<div class="flex-fill">
+										<div class="w-100"><label class="label-1 p-1">AV AO</label>{{ optica_form.subjetivo_av_ao }}</div>
+									</div>
+								</div>
+							</fieldset>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>ADD</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.add_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.add_oi }}
+								</div>
+							</fieldset>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend>Formula final Lejos</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.formula_lej_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.formula_lej_oi }}
+								</div>
+								<legend>Formula final Cerca add</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.formula_cer_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.formula_cer_oi }}
+								</div>
+							</fieldset>
+							<div class="w-100 mt-2 mb-1"><label class="label-1-doble p-1">Observaciones generales y remisiones</label>{{ optica_form.obs_generales }}</div>
+							<button type="submit" name="cargaOptica" class="btn btn-success m-2 w-25">Guardar</button>
 						</form>
 
-						<textarea class="form-control detalle" id="entradaHoy" aria-label="With textarea" placeholder="Escribir aquí la historia clínica del día {{ diaElegido|date:'l, j F Y' }}">{{ entradaElegida.comentarios }}</textarea>
+						<textarea class="form-control detalle hiddenn" id="entradaHoy" aria-label="With textarea" placeholder="Escribir aquí la historia clínica del día {{ diaElegido|date:'l, j F Y' }}">{{ entradaElegida.comentarios }}</textarea>
 						<form method="POST" action="/perfil/{{persona.id}}" id="cargaImg" enctype="multipart/form-data">
 							{% csrf_token %}
 							<input type="" name="fecha" required id="id_fecha" value="{{ diaElegido|date:'Y-m-d' }}" class="hiddenn">
@@ -224,28 +256,28 @@
 					</div>
 					{% for entrada in entradas %}
 					<div class="p-2 entrada">
-						<p class="titulo">{{ entrada.fecha|date:"l, j F Y" }}</p>
+						<p class="titulo" style="margin-bottom: .5rem;">{{ entrada.fecha|date:"l, j F Y" }}</p>
 						<div class="d-flex">
-							<div style="width: 50%;">
-								{% if entrada.motivo_consulta %}<h5>Motivo Consulta</h5><span>{{entrada.motivo_consulta}}{% endif %}
-								{% if entrada.medicamentos %}<h5>Medicamentos</h5><span>{{entrada.medicamentos}}{% endif %}
-								{% if entrada.antec_medicos %}<h5>Antecedentes Médicos</h5><span>{{entrada.antec_medicos}}{% endif %}
-								{% if entrada.antec_oculares %}<h5>Antecedentes Oculares</h5><span>{{entrada.antec_oculares}}{% endif %}
-								{% if entrada.obs_segmento %}<h5>Observaciones segmento anterior y posterior</h5><span>{{entrada.obs_segmento}}{% endif %}
-								{% if entrada.obs_generales %}<h5>Observaciones generales y remisiones</h5><span>{{entrada.obs_generales}}{% endif %}
+							<div style="width: 50%; margin-right: .5rem;">
+								{% if entrada.motivo_consulta %}<h5>Motivo Consulta</h5><span>{{entrada.motivo_consulta}}</span>{% endif %}
+								{% if entrada.medicamentos %}<h5>Medicamentos</h5><span>{{entrada.medicamentos}}</span>{% endif %}
+								{% if entrada.antec_medicos %}<h5>Antecedentes Médicos</h5><span>{{entrada.antec_medicos}}</span>{% endif %}
+								{% if entrada.antec_oculares %}<h5>Antecedentes Oculares</h5><span>{{entrada.antec_oculares}}</span>{% endif %}
+								{% if entrada.obs_segmento %}<h5>Observaciones segmento anterior y posterior</h5><span>{{entrada.obs_segmento}}</span>{% endif %}
+								{% if entrada.obs_generales %}<h5>Observaciones generales y remisiones</h5><span>{{entrada.obs_generales}}</span>{% endif %}
 							</div>
-							<div>
+							<div class="w-50 mediciones">
 								{% if entrada.akr %}<h5>AKR</h5><b>OD: </b><span>{{entrada.akr.OD}}</span><b>  OI: </b><span>{{entrada.akr.OI}}</span>{% endif %}
 								{% if entrada.av_sc %}<h5>AV/SC</h5><b>OD: </b><span>{{entrada.av_sc.OD}}</span><b>  OI: </b><span>{{entrada.av_sc.OI}}</span><b>  AO: </b><span>{{entrada.av_sc.AO}}</span>{% endif %}
 								{% if entrada.av_cc %}<h5>AV/CC</h5><b>OD: </b><span>{{entrada.av_cc.OD}}</span><b>  OI: </b><span>{{entrada.av_cc.OI}}</span><b>  AO: </b><span>{{entrada.av_cc.AO}}</span>{% endif %}
 								{% if entrada.retinoscopia %}<h5>Retinoscopia</h5><b>OD: </b><span>{{entrada.retinoscopia.OD}}</span><b>  OI: </b><span>{{entrada.retinoscopia.OI}}</span>{% endif %}
-								{% if entrada.subjetivo %}<h5>Subjetivo / afinación</h5><b>OD: </b><span>{{entrada.subjetivo.OD}}</span><b>  AV OD: </b><span>{{entrada.subjetivo.AV_OD}}</span><b>  OI: </b><span>{{entrada.subjetivo.OI}}</span><b>  AV OI: </b><span>{{entrada.subjetivo.AV_OI}}</span><b>  AV AO: </b><span>{{entrada.subjetivo.AV_AO}}</span>{% endif %}
+								{% if entrada.subjetivo %}<h5>Subjetivo / afinación</h5><b>OD: </b><span>{{entrada.subjetivo.OD}}</span><b>  OI: </b><span>{{entrada.subjetivo.OI}}</span><br><b>  AV OD: </b><span>{{entrada.subjetivo.AV_OD}}</span><b>  AV OI: </b><span>{{entrada.subjetivo.AV_OI}}</span><b>  AV AO: </b><span>{{entrada.subjetivo.AV_AO}}</span>{% endif %}
 								{% if entrada.add %}<h5>ADD</h5><b>OD: </b><span>{{entrada.add.OD}}</span><b>  OI: </b><span>{{entrada.add.OI}}</span>{% endif %}
-								{% if entrada.formula %}<h5>Formula final</h5><b>  Lejos OD: </b><span>{{entrada.formula.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.formula.lejos_OI}}</span><b>Cerca OD: </b><span>{{entrada.formula.cerca_OD}}</span><b>Cerca OI: </b><span>{{entrada.formula.cerca_OI}}</span>{% endif %}
+								{% if entrada.formula %}<h5>Formula final</h5><b>  Lejos OD: </b><span>{{entrada.formula.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.formula.lejos_OI}}</span><br><b>Cerca add OD: </b><span>{{entrada.formula.cerca_OD}}</span><b>Cerca add OI: </b><span>{{entrada.formula.cerca_OI}}</span>{% endif %}
 							</div>
 						</div>
 
-						<textarea class="form-control detalle mb-2" aria-label="With textarea" placeholder="Vacia" disabled>{{ entrada.comentarios }}</textarea>
+						<textarea class="form-control detalle mb-2 hiddenn" aria-label="With textarea" placeholder="Vacia" disabled>{{ entrada.comentarios }}</textarea>
 						<div class="d-flex justify-content-between">
 							{% if entrada.imagenes.all %}
 							<div {% if entrada.archivos.all %} style="max-width: 50%;" {% endif %}>

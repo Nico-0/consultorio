@@ -57,6 +57,10 @@ p b {
 	max-height: 120px;
 }
 
+.nuevoPaciente{
+	width: 500px;
+}
+
 @media (width <= 920px) {
 	div p{
 		margin-bottom: 0px;
