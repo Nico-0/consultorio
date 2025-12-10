@@ -52,7 +52,9 @@ class Entrada(models.Model):
     obs_segmento = models.TextField(blank=True)
     obs_generales = models.TextField(blank=True)
 
+    cc_uso = models.JSONField(default=dict, blank=True)
     akr = models.JSONField(default=dict, blank=True)
+    queratometria = models.JSONField(default=dict, blank=True)
     av_sc = models.JSONField(default=dict, blank=True)
     av_cc = models.JSONField(default=dict, blank=True)
     retinoscopia = models.JSONField(default=dict, blank=True)

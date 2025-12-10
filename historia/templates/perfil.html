@@ -159,16 +159,43 @@
 							<div class="w-100 pb-2"><label class="label-1 p-1">Medicamentos</label>{{ optica_form.medicamentos }}</div>
 							<div class="w-100 pb-2"><label class="label-1 p-1">Antecedentes médicos </label>{{ optica_form.antec_medicos }}</div>
 							<div class="w-100 pb-1"><label class="label-1 p-1">Antecedentes oculares </label>{{ optica_form.antec_oculares }}</div>
+							<fieldset class="ps-3 pb-2 rounded-2" title="llantas actuales">
+								<legend>CC en uso Lejos</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.cc_uso_lej_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.cc_uso_lej_oi }}
+								</div>
+								<legend>CC en uso Cerca add</legend>
+								<div class="w-100">
+									<label class="label-2 p-1">OD</label>{{ optica_form.cc_uso_cer_od }}
+									<label class="label-2 p-1">OI</label>{{ optica_form.cc_uso_cer_oi }}
+								</div>
+							</fieldset>
 							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>AKR </legend>
+								<legend>Autorrefractometría</legend>
 								<div class="w-100">
 									<label class="label-2 p-1">OD </label>{{ optica_form.akr_od }}
 									<label class="label-2 p-1">OI </label>{{ optica_form.akr_oi }}
 								</div>
-								<i>Dos curvaturas?</i>
 							</fieldset>
 							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>AV/SC</legend>
+								<legend>Queratometría</legend>
+								<div class="w-100 d-flex align-items-center" id="subjetivo">
+									<div class="flex-fill">
+										<div class="w-100 pb-2"><label class="label-1 p-1">OD</label>{{ optica_form.quera_od }}</div>
+										<div class="w-100"><label class="label-1 p-1">OI</label>{{ optica_form.quera_oi }}</div>
+									</div>
+									<div class="flex-fill">
+										<div class="w-100 pb-2"><label class="label-1 p-1" title="Astigmatismo corneal">Ast</label>{{ optica_form.quera_od_ast }}</div>
+										<div class="w-100"><label class="label-1 p-1" title="Astigmatismo corneal">Ast</label>{{ optica_form.quera_oi_ast }}</div>
+									</div>
+									<div class="flex-fill hidden">
+										<div class="w-100"><label class="label-1 p-1">Nada</label><input></div>
+									</div>
+								</div>
+							</fieldset>
+							<fieldset class="ps-3 pb-2 rounded-2">
+								<legend title="Agudeza visual sin corrección">AV/SC</legend>
 								<div class="w-100">
 									<label class="label-2 p-1">OD</label>{{ optica_form.av_sc_od }}
 									<label class="label-2 p-1">OI</label>{{ optica_form.av_sc_oi }}
@@ -176,7 +203,7 @@
 								</div>
 							</fieldset>
 							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>AV/CC en uso</legend>
+								<legend title="Agudeza visual con corrección">AV/CC en uso</legend>
 								<div class="w-100">
 									<label class="label-2 p-1">OD</label>{{ optica_form.av_cc_od }}
 									<label class="label-2 p-1">OI</label>{{ optica_form.av_cc_oi }}
@@ -267,7 +294,9 @@
 								{% if entrada.obs_generales %}<h5>Observaciones generales y remisiones</h5><span>{{entrada.obs_generales}}</span>{% endif %}
 							</div>
 							<div class="w-50 mediciones">
-								{% if entrada.akr %}<h5>AKR</h5><b>OD: </b><span>{{entrada.akr.OD}}</span><b>  OI: </b><span>{{entrada.akr.OI}}</span>{% endif %}
+								{% if entrada.cc_uso %}<h5>CC en uso</h5><b>  Lejos OD: </b><span>{{entrada.cc_uso.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.cc_uso.lejos_OI}}</span><br><b>Cerca add OD: </b><span>{{entrada.cc_uso.cerca_OD}}</span><b>Cerca add OI: </b><span>{{entrada.cc_uso.cerca_OI}}</span>{% endif %}
+								{% if entrada.akr %}<h5>Autorrefractometría</h5><b>OD: </b><span>{{entrada.akr.OD}}</span><b>  OI: </b><span>{{entrada.akr.OI}}</span>{% endif %}
+								{% if entrada.queratometria %}<h5>Queratometría</h5><b>  OD: </b><span>{{entrada.queratometria.OD}}</span><b>Ast: </b><span>{{entrada.queratometria.OD_ast}}</span><br><b>OI: </b><span>{{entrada.queratometria.OI}}</span><b>Ast: </b><span>{{entrada.queratometria.OI_ast}}</span>{% endif %}
 								{% if entrada.av_sc %}<h5>AV/SC</h5><b>OD: </b><span>{{entrada.av_sc.OD}}</span><b>  OI: </b><span>{{entrada.av_sc.OI}}</span><b>  AO: </b><span>{{entrada.av_sc.AO}}</span>{% endif %}
 								{% if entrada.av_cc %}<h5>AV/CC</h5><b>OD: </b><span>{{entrada.av_cc.OD}}</span><b>  OI: </b><span>{{entrada.av_cc.OI}}</span><b>  AO: </b><span>{{entrada.av_cc.AO}}</span>{% endif %}
 								{% if entrada.retinoscopia %}<h5>Retinoscopia</h5><b>OD: </b><span>{{entrada.retinoscopia.OD}}</span><b>  OI: </b><span>{{entrada.retinoscopia.OI}}</span>{% endif %}

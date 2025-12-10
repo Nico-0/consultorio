@@ -21,9 +21,8 @@ class PacienteForm(forms.ModelForm):
 class PacienteFullForm(forms.ModelForm):
     class Meta:
         model = Persona
-        fields = ['apellido', 'nombre', 'dni', 'email', 'nacimiento', 'sexo', 'localidad', 'ocupacion', 'telefono', 'sangre',
-                   'obraSocial', 'afiliado', 'obraSocial2', 'afiliado2',
-                    'peso', 'altura', 'extras']
+        fields = ['apellido', 'nombre', 'dni', 'email', 'nacimiento', 'sexo', 'localidad', 'ocupacion', 'telefono',
+                  'sangre', 'obraSocial', 'afiliado', 'obraSocial2', 'afiliado2','peso', 'altura', 'extras']
         widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
                    'peso': forms.NumberInput(attrs={'min': 0, 'max': '999'}),
                    'altura': forms.NumberInput(attrs={'min': 0, 'max': '9'}) # 'class': 'form-control'
@@ -36,9 +35,17 @@ class PacienteFullForm(forms.ModelForm):
 
 class OpticaExamForm(forms.ModelForm):
 
-    # 21 fields inside 7 json fields
+    # 29 fields inside 9 json fields
+    cc_uso_lej_od = forms.CharField(label="CC uso lejos OD", required=False)
+    cc_uso_lej_oi = forms.CharField(label="CC uso lejos OI", required=False)
+    cc_uso_cer_od = forms.CharField(label="CC uso cerca OD", required=False)
+    cc_uso_cer_oi = forms.CharField(label="CC uso cerca OI", required=False)
     akr_od = forms.CharField(label="AKR OD", required=False)
     akr_oi = forms.CharField(label="AKR OI", required=False)
+    quera_od = forms.CharField(label="Queratometria OD", required=False)
+    quera_oi = forms.CharField(label="Queratometria OI", required=False)
+    quera_od_ast = forms.CharField(label="Queratometria OD acorneal", required=False)
+    quera_oi_ast = forms.CharField(label="Queratometria OI acorneal", required=False)
     av_sc_od = forms.CharField(label="AV/SC OD", required=False)
     av_sc_oi = forms.CharField(label="AV/SC OI", required=False)
     av_sc_ao = forms.CharField(label="AV/SC AO", required=False)
@@ -73,7 +80,9 @@ class OpticaExamForm(forms.ModelForm):
         self.fields["obs_generales"].widget.attrs.update({'class': "myArea"})
         # Prepopulate inputs from JSON content into form fields on render
         if self.instance and self.instance.pk:
+            cc_uso = self.instance.cc_uso or {}
             akr = self.instance.akr or {}
+            queratometria = self.instance.queratometria or {}
             av_sc = self.instance.av_sc or {}
             av_cc = self.instance.av_cc or {}
             retinoscopia = self.instance.retinoscopia or {}
@@ -81,8 +90,16 @@ class OpticaExamForm(forms.ModelForm):
             add = self.instance.add or {}
             formula = self.instance.formula or {}
 
+            self.fields["cc_uso_lej_od"].initial = cc_uso.get("lejos_OD", "")
+            self.fields["cc_uso_lej_oi"].initial = cc_uso.get("lejos_OI", "")
+            self.fields["cc_uso_cer_od"].initial = cc_uso.get("cerca_OD", "")
+            self.fields["cc_uso_cer_oi"].initial = cc_uso.get("cerca_OI", "")
             self.fields["akr_od"].initial = akr.get("OD", "")
             self.fields["akr_oi"].initial = akr.get("OI", "")
+            self.fields["quera_od"].initial = queratometria.get("OD", "")
+            self.fields["quera_oi"].initial = queratometria.get("OI", "")
+            self.fields["quera_od_ast"].initial = queratometria.get("OD_ast", "")
+            self.fields["quera_oi_ast"].initial = queratometria.get("OI_ast", "")
             self.fields["av_sc_od"].initial = av_sc.get("OD", "")
             self.fields["av_sc_oi"].initial = av_sc.get("OI", "")
             self.fields["av_sc_ao"].initial = av_sc.get("AO", "")
@@ -109,8 +126,14 @@ class OpticaExamForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         # Pack all form inputs back into JSONs on post
+        lej_od, lej_oi, cer_od, cer_oi = cleaned.get("cc_uso_lej_od"), cleaned.get("cc_uso_lej_oi"), cleaned.get("cc_uso_cer_od"), cleaned.get("cc_uso_cer_oi")
+        cleaned["cc_uso"] = {"lejos_OD": lej_od, "lejos_OI": lej_oi, "cerca_OD": cer_od, "cerca_OI": cer_oi} if any([lej_od, lej_oi, cer_od, cer_oi]) else {}
+
         od, oi = cleaned.get("akr_od"), cleaned.get("akr_oi")
         cleaned["akr"] = {"OD": od, "OI": oi} if (od or oi) else {}
+
+        od, oi, od_ast, oi_ast = cleaned.get("quera_od"), cleaned.get("quera_oi"), cleaned.get("quera_od_ast"), cleaned.get("quera_oi_ast")
+        cleaned["queratometria"] = {"OD": od, "OI": oi, "OD_ast": od_ast, "OI_ast": oi_ast} if any([od, oi, od_ast, oi_ast]) else {}
 
         od, oi, ao = cleaned.get("av_sc_od"), cleaned.get("av_sc_oi"), cleaned.get("av_sc_ao")
         cleaned["av_sc"] = {"OD": od, "OI": oi, "AO": ao} if (od or oi or ao) else {}
@@ -133,7 +156,9 @@ class OpticaExamForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        instance.cc_uso = self.cleaned_data["cc_uso"]
         instance.akr = self.cleaned_data["akr"]
+        instance.queratometria = self.cleaned_data["queratometria"]
         instance.av_sc = self.cleaned_data["av_sc"]
         instance.av_cc = self.cleaned_data["av_cc"]
         instance.retinoscopia = self.cleaned_data["retinoscopia"]
