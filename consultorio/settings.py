@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 # append local ip, works for the first network adapter, disable virtual adapters
-localip = socket.gethostbyname(socket.gethostname())
+localip = (lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] #socket.gethostbyname(socket.gethostname())
 ALLOWED_HOSTS.append(localip)
 qrimg = qrcode.make('http://'+localip+':8000')
 qrimg.save("historia/static/qrip.png")

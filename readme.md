@@ -2,12 +2,12 @@
 
 ## Run the program
 
-- Disable debug mode in `consultorio/settings.py`
-
+- [Install Git cli](https://git-scm.com/install) if support for the in-app update button is desired.
+- [Install Python 3.10.11](https://www.python.org/downloads/release/python-31011/)
 - `pip install django`
+- `pip install python-dateutil`
 - `pip install pillow-heif`
 - `pip install qrcode`
-- `python manage.py runserver`
 - `python manage.py makemigrations`
 - `python manage.py migrate`
 
@@ -21,6 +21,25 @@
 - Download and place `client_secrets.json` at the root of this server.
 - [Create a new test user](https://console.cloud.google.com/auth/audience) with your desired email.
 - Copy the ID of any Drive folder from the URL, and place it in `DRIVE_FOLDER_ID` inside `consultorio/settings.py` or inside `drive_folder_id.txt`.
+
+## Run the program
+
+- `python manage.py runserver 0.0.0.0:8000`
+
+### Autorun
+
+> So far, this server is designed to run on the same computer as the client.
+> Windows task scheduler:
+
+- General -> Run logged or not. Trigger -> On boot.
+- Start a program `cmd`
+- Add Argument field: `/c python "C:\consultorio\manage.py" runserver 0.0.0.0:8000`
+- Start in field: `C:\consultorio`
+
+
+### Pending testing
+
+- Disable debug mode in `consultorio/settings.py`
 
 ### (Deprecated) Configure backups with service account (missing shared drive)
 

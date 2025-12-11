@@ -28,7 +28,7 @@ ITEMS_PER_PAGE = 8
 def get_commits_api(): #deprecated
     import requests
     try: # fetch github commits api
-        response = requests.get("https://api.github.com/repos/Nico-0/consultorio/commits")
+        response = requests.get("https://api.github.com/repos/user/repo/commits")
         response.raise_for_status()
         data = response.json()
         ultimoCommit = data[0]['sha'][:7]
@@ -48,13 +48,13 @@ def about(request):
     context['title'] = 'About'
     context['css'] = 'consultorio.css'
     context['activeC'] = True
-    context['ip'] = socket.gethostbyname(socket.gethostname()) + ':8000'
+    context['ip'] = (lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] + ':8000' #socket.gethostbyname(socket.gethostname())
     context['showVersiones'] = settings.SHOW_GIT_VERSIONS
     branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
     context['branch'] = branch
     
     context['botonUpdate'] = False
-    gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True, shell=True)
+    gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True)
     if(gitcmd.returncode):
         context['version'] = context['botonText'] = 'Error de git' # Git no instalado o falta carpeta .git
     else:
