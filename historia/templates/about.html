@@ -14,16 +14,19 @@
 
     <h2 class="text-center">Versión actual</h2>
 
-    <p>Versión: {{version}}</p>
+    <span>Versión: {{version}}</span>
+    <span>Fecha: {{fechaActual}}</span>
 
     <form method="POST" action="/about/" id="">
 		{% csrf_token %}
 		<button class="btn btn-outline-success mb-5" name="pull" {% if botonUpdate is False %}disabled{% endif %}>{{botonText}}</button>
 	</form>
 
-    <h3 class="text-center">Lista de versiones:</h3>
+    {% if showVersiones %} 
+    <h3 class="text-center mb-0">Lista de versiones:</h3>
 
     {{error}}
+    <span>{{branch}}</span>
     <table class="table" style="max-width: 25em;">
         <thead>
             <tr>
@@ -39,8 +42,9 @@
             </tr>
     {% endfor %}
         </tbody>
-    </table>
+    </table>{% endif %}
 
+    <p>© Nico</p>
 
 </div>
 

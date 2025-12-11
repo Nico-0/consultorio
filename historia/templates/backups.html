@@ -5,20 +5,22 @@
 
 <div class="d-flex flex-column mb-3 mt-5 padre align-items-center">
 
-    <a class="btn btn-outline-primary" name="ver" href="https://drive.google.com/drive/folders/{{carpeta}}" target="_blank">Ver backups online</a>
+    <form method="POST" action="/backups/" id="cargaBackup">
+		{% csrf_token %}
+		<button class="btn btn-outline-success mb-3" name="generar">Generar backup</button>
+	</form>
 
-    <h3 class="text-center">Fecha de último backup Gdrive:</h3>
+    <h3 class="text-center">Backups Google Drive:</h3>
+    <a class="btn btn-outline-primary" name="ver" href="https://drive.google.com/drive/folders/{{carpeta}}" target="_blank">Ver backups online</a>
     <p>{{ lastBackup|date:"l, j F Y, H:i:s" }}</p>
 
     <h3 class="text-center">Backups locales:</h3>
-    <textarea class="form-control" id="" aria-label="With textarea" placeholder="Vacio" style="max-width: 22em; min-height: 6em; white-space: nowrap;">{{ backups }}</textarea>
+    <a href="file:///{{carpetaBackups}}">{{carpetaBackups}}</a>
+    <textarea class="form-control mb-3" id="" aria-label="With textarea" placeholder="Vacio" style="max-width: 22em; min-height: 9em; white-space: nowrap;">{{ backups }}</textarea>
 
-    <form method="POST" action="/backups/" id="cargaBackup">
-		{% csrf_token %}
-		<button class="btn btn-outline-success" name="generar">Generar backup</button>
-	</form>
-
-    <button class="btn btn-outline-secondary mt-5" name="" disabled>Botón para actualizar aplicación</button>
+    <h4 class="text-center">Archivos cargados:</h4>
+    <span>Sin backup</span>
+    <a href="file:///{{carpetaMedia}}">{{carpetaMedia}}</a>
 
 </div>
 

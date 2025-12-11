@@ -35,7 +35,9 @@ qrimg = qrcode.make('http://'+localip+':8000')
 qrimg.save("historia/static/qrip.png")
 
 # Custom settings
+BACKUP_LOCATION = "backups/"    # "C:\\backupsConsultorio\\"
 DRIVE_FOLDER_ID = ""
+SHOW_GIT_VERSIONS = True
 
 # Application definition
 
@@ -130,7 +132,7 @@ STATIC_URL = 'static/'
 
 MEDIA_URL = "files/"
 
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media"     # "C:\\mediaConsultorio"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from dateutil.relativedelta import relativedelta
 import shutil
+import hashlib
 import json
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -25,6 +26,8 @@ filename = "db.sqlite3"
 mimeType = 'application/x-7z-compressed'
 BACKUP_TIMESTAMP_FILE = './last_backup.txt'
 DRIVE_FOLDER_ID_FILE = './drive_folder_id.txt'
+BACKUP_LOCATION = settings.BACKUP_LOCATION
+
 DRIVE_LOGIN = False
 
 '''
@@ -89,12 +92,14 @@ def get_nameTime():
 def get_last_backup_time():
     try:
         with open(BACKUP_TIMESTAMP_FILE, 'r') as f:
-            return parse_datetime(f.read().strip())
+            timestamp = f.readline().strip()
+            hash = f.readline().strip()            
+            return parse_datetime(timestamp), hash
     except FileNotFoundError:
-        return None
+        return None, None
     except Exception as e:
         print("⚠️🚨 Error reading backup time file:", e)
-        return None
+        return None, None
     
 def get_set_drive_folder():
     try:
@@ -119,48 +124,60 @@ def rutinaBackup(creds):
     days_local_freq = 1
     days_online_freq = 2
     backupFile = None
+    newHash = None
 
     # backup local
     try:
-        last_backup = timezone.datetime.fromtimestamp(os.path.getmtime("backups/"))
-    except FileNotFoundError:
+        last_backup_file = os.listdir(BACKUP_LOCATION)[::-1][0]
+        last_backup_hash = hashlib.md5(open(BACKUP_LOCATION+last_backup_file,'rb').read()).hexdigest()
+        print(f"Ultimo backup local: {last_backup_file}, '{last_backup_hash}'")
+        last_backup = timezone.datetime.fromtimestamp(os.path.getmtime(BACKUP_LOCATION+last_backup_file))
+    except (FileNotFoundError, IndexError):
         last_backup = None
+        last_backup_hash = None
     now = timezone.localtime(timezone.now()).replace(tzinfo=None)
     delta = relativedelta(now, last_backup).days
     if(delta > days_local_freq or last_backup is None):
-        backupFile = backupLocal()
+        backupFile, newHash = backupLocal(last_backup_hash)
     else:
-        print("Dias desde el ultimo backup local: ", delta)
+        print("Dias desde el ultimo backup local: ", delta, " freq: ", days_local_freq)
 
 
     if(creds is not None):
         # rutina backup online
-        last_backup = get_last_backup_time()
+        last_backup, last_hash = get_last_backup_time()
         delta = relativedelta(now, last_backup).days
-        print("\nUltimo backup online: ", last_backup, file=sys.stderr)
+        print(f"\nUltimo backup online: {last_backup}, '{last_hash}'")
         if(delta > days_online_freq or last_backup is None):
-            backupOnline(backupFile, creds)
+            backupOnline(backupFile, newHash, last_hash, creds)
         else:
             login_completed()
-            print("Dias desde el ultimo backup online: ", delta, "\n", file=sys.stderr)
+            print("Dias desde el ultimo backup online: ", delta, " freq: ", days_online_freq, "\n")
 
-def backupLocal():
+def backupLocal(last_backup_hash):
     try:
-        os.makedirs('./backups/', exist_ok=True)
-        compressed = shutil.make_archive('./backups/'+get_nameTime(), "zip", ".", filename)
-        print("Nuevo backup local: ", compressed, file=sys.stderr)
-        return compressed
+        os.makedirs(BACKUP_LOCATION, exist_ok=True)
+        compressed = shutil.make_archive(BACKUP_LOCATION+get_nameTime(), "zip", ".", filename)
+        new_backup_hash = hashlib.md5(open(compressed,'rb').read()).hexdigest()
+        if((new_backup_hash != last_backup_hash) or last_backup_hash is None):
+            print("Nuevo backup local: ", compressed, file=sys.stderr)
+            return compressed, new_backup_hash
+        else:
+            os.remove(compressed)   #todo comprimir en memoria para no crear y borrar
+            print('Backup duplicado, borrando '+new_backup_hash)
+            return None, None
     except FileNotFoundError:
         print("FileNotFoundError en backup local")
 
 
-def backupOnline(backupFile, creds):
+def backupOnline(backupFile, newHash, lastHash, creds):
     backupCompleto = False
     try:
         if(backupFile is None):
-            backupFile = backupLocal()
-        upload_file(backupFile, creds)
-        backupCompleto = True
+            backupFile, newHash = backupLocal(lastHash)
+        if(backupFile is not None):
+            upload_file(backupFile, creds)
+            backupCompleto = True
         login_completed()
     except FileNotFoundError:
         print("FileNotFoundError", file=sys.stderr)
@@ -176,14 +193,15 @@ def backupOnline(backupFile, creds):
     if(backupCompleto):
         with open(BACKUP_TIMESTAMP_FILE, 'w') as f:
             f.write(str(timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")))
-        print("Backup online completo\n", file=sys.stderr)
+            f.write('\n' + newHash)
+        print(f"Backup online completo: {backupFile}\n", file=sys.stderr)
     else:
-        print("Error de backup online\n", file=sys.stderr)
+        print("No realizado backup online\n", file=sys.stderr)
     
 def forzarBackup():
     gauth = auth()
     try:
-        backupOnline(None, gauth)
+        backupOnline(None, None, None, gauth)
     except (GApiReqError, ServerNotFoundError) as e:
         print(e)
 

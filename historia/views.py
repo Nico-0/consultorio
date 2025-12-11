@@ -18,11 +18,28 @@ from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 import os
-import requests
 from PIL import Image, UnidentifiedImageError
 from django.core.files.base import ContentFile
 from io import BytesIO
+from .backup import get_last_backup_time, forzarBackup
+from django.conf import settings
 ITEMS_PER_PAGE = 8
+
+def get_commits_api(): #deprecated
+    import requests
+    try: # fetch github commits api
+        response = requests.get("https://api.github.com/repos/Nico-0/consultorio/commits")
+        response.raise_for_status()
+        data = response.json()
+        ultimoCommit = data[0]['sha'][:7]
+        commits = []
+        for commit in data:
+            commits.append({'fecha': commit['commit']['committer']['date'][:10], 'hash': commit['sha'][:7]})
+        return ultimoCommit, commits
+    except requests.exceptions.RequestException as e:
+        print("Error de conexion git api")
+        #context['error'] = f"Error de conexion: reinicie la pagina"#: {e}"
+        #context['botonText'] = 'Error de conexión'
 
 def about(request):
     import subprocess
@@ -32,49 +49,43 @@ def about(request):
     context['css'] = 'consultorio.css'
     context['activeC'] = True
     context['ip'] = socket.gethostbyname(socket.gethostname()) + ':8000'
-    
-    """ Opcion no usada, pero seria util en caso de a futuro no querer usar la api y comparar todo local
-    gitcmderror = subprocess.run(['git', 'fetch'], capture_output=True, text=True, shell=True).returncode
-    gitstatus = subprocess.run(['git', 'status'], capture_output=True, text=True, shell=True).stdout.splitlines()[1]
-    if(gitstatus.startswith('Your branch is behind')):
-        # Hay nueva version disponible
-        context['botonUpdate'] = True # activar boton de update y su descripcion
-    else:
-        # Para Para 'Your branch is up to date' o cualquier error
-        # Falta considerar 'HEAD detached at' (checkout de commit anterior)
-        context['botonUpdate'] = False
-    """
+    context['showVersiones'] = settings.SHOW_GIT_VERSIONS
+    branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
+    context['branch'] = branch
     
     context['botonUpdate'] = False
     gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True, shell=True)
     if(gitcmd.returncode):
-        context['version'] = context['botonText'] = 'Git no instalado'
+        context['version'] = context['botonText'] = 'Error de git' # Git no instalado o falta carpeta .git
     else:
         commitActual = gitcmd.stdout.strip()
         context['version'] = commitActual
-        try: # fetch github commits api
-            response = requests.get("https://api.github.com/repos/Nico-0/consultorio/commits")
-            response.raise_for_status()
-            data = response.json()
-            ultimoCommit = data[0]['sha'][:7]
-            if(commitActual == ultimoCommit):
-                context['botonText'] = 'Última versión instalada'
-            else:
-                context['botonUpdate'] = True
-                context['botonText'] = 'Actualizar a la última versión'
-            commits = []
-            for commit in data:
-                commits.append({'fecha': commit['commit']['committer']['date'][:10], 'hash': commit['sha'][:7]})
-            context['commits'] = commits
+        context['fechaActual'] = subprocess.run(['git', 'show', '-s', '--pretty=%cd', '--date=format:%Y-%m-%d'],stdout=subprocess.PIPE, text=True).stdout.strip()
 
-        except requests.exceptions.RequestException as e:
-            context['error'] = f"Error de conexion: reinicie la pagina"#: {e}"
+        #ultimoCommit, commits = get_commits_api()
+        fetch = subprocess.run(["git", "fetch", "origin"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        remoteCommit = subprocess.run(['git', 'rev-parse', '--short', f'origin/{branch}'], capture_output=True, text=True).stdout.strip()
+        commitsText = subprocess.run(['git', 'log', '--pretty=format:%cd$%h', '--date=format:%Y-%m-%d'], stdout=subprocess.PIPE, text=True).stdout
+        commitsList = []
+        for line in commitsText.splitlines():
+            fecha, hash_ = line.split('$')
+            commitsList.append({"fecha": fecha, "hash": hash_})
+
+        context['commits'] = commitsList
+        if(commitActual == remoteCommit):
+            context['botonText'] = 'Última versión instalada'
+        else:
+            context['botonUpdate'] = True
+            context['botonText'] = 'Actualizar a la última versión'
+        if(fetch.returncode != 0):
             context['botonText'] = 'Error de conexión'
+            context['botonUpdate'] = False
+
     
     if request.method == 'POST': # todo ponerlo en una url mas descriptiva
         # actualizar programa
         if 'pull' in request.POST:
-            # todo hacer backup antes de actualizar
+            forzarBackup()
             subprocess.run(['git', 'pull'])
             subprocess.run(['python', 'manage.py', 'migrate'])
     
@@ -85,11 +96,12 @@ def backups(request):
     context['title'] = 'Backups'
     context['css'] = 'consultorio.css'
     context['activeB'] = True
-    from .backup import get_last_backup_time, forzarBackup
-    from django.conf import settings
-    context['backups'] = "\n".join(os.listdir('./backups')[::-1])
-    context['lastBackup'] = get_last_backup_time()
+    carpetaBackups = settings.BACKUP_LOCATION
+    context['carpetaBackups'] = os.path.abspath(carpetaBackups)
+    context['backups'] = "\n".join(os.listdir(carpetaBackups)[::-1])
+    context['lastBackup'], hash = get_last_backup_time()
     context['carpeta'] = settings.DRIVE_FOLDER_ID
+    context['carpetaMedia'] = os.path.abspath(settings.MEDIA_ROOT)
     if request.method == 'POST':
         if 'generar' in request.POST:
             forzarBackup()
