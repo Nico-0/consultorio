@@ -12,3 +12,7 @@ class HistoriaConfig(AppConfig):
         get_set_drive_folder()
         initBackup()
 
+
+from django.conf import settings
+def flavor(request):
+    return {'APP_FLAVOR': settings.APP_FLAVOR}

@@ -1,6 +1,6 @@
 # Consultorio
 
-## Run the program
+## Installation
 
 - [Install Git cli](https://git-scm.com/install) if support for the in-app update button is desired.
 - [Install Python 3.10.11](https://www.python.org/downloads/release/python-31011/)
@@ -24,6 +24,7 @@
 
 ## Run the program
 
+- Setup app flavor, `OPTICAL` or `GENERAL` inside `consultorio/settings.py`
 - `python manage.py runserver 0.0.0.0:8000`
 
 ### Autorun

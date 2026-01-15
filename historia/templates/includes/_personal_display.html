@@ -1,0 +1,92 @@
+<fieldset disabled id="displayDatos">
+    <div class="p-2">
+        <label for="nacimiento" class="form-label">Nacimiento:</label>
+        <div class="d-flex flex-row align-items-end"> 
+            <input type="text" class="form-control w-50" value="{{ persona.nacimiento }}" id="nacimiento">
+            <label class="form-label ms-3">{{ edadHoy }} años</label>
+        </div>
+    </div>
+    <div class="d-flex flex-row"> 
+        <div class="p-2">
+            <label for="dni" class="form-label">DNI:</label>
+            <input type="text" class="form-control" value="{{ persona.dni }}" id="dni">
+        </div>
+        <div class="p-2">
+            <label for="afiliado" class="form-label">Sexo:</label>
+            <input type="text" class="form-control w-25" value="{{ persona.sexo }}" id="sexo">
+        </div>
+    </div>
+    <div class="d-flex flex-row"> 
+        <div class="p-2">
+            <label for="tel" class="form-label">Teléfono:</label>
+            <input type="text" class="form-control " value="{{ persona.telefono }}" id="tel">
+        </div>
+        <div class="p-2">
+            <label for="email" class="form-label">Email:</label>
+            <input type="text" class="form-control " value="{{ persona.email }}" id="email">
+        </div>
+    </div>
+    <div class="d-flex flex-row"> 
+        <div class="p-2">
+            <label for="localidad" class="form-label">Localidad:</label>
+            <input type="text" class="form-control " value="{{ persona.localidad }}" id="localidad">
+        </div>
+        <div class="p-2">
+            <label for="ocupacion" class="form-label">Ocupacion:</label>
+            <input type="text" class="form-control " value="{{ persona.ocupacion }}" id="ocupacion">
+        </div>
+    </div>
+    {% if APP_FLAVOR != 'OPTICAL' %}<div class="d-flex flex-row"> 
+        <div class="p-2">
+            <label for="obra" class="form-label">Obra social:</label>
+            <input type="text" class="form-control " value="{{ persona.obraSocial }}" id="obra">
+        </div>
+        <div class="p-2">
+            <label for="afiliado" class="form-label">Número de afiliado:</label>
+            <input type="text" class="form-control " value="{{ persona.afiliado }}" id="afiliado">
+        </div>
+    </div>{% endif %}
+    <div id="extraFields" style="visibility: hidden; position: absolute">
+        {% if APP_FLAVOR == 'OPTICAL' %}<div class="d-flex flex-row"> 
+            <div class="p-2">
+                <label for="obra" class="form-label">Obra social:</label>
+                <input type="text" class="form-control " value="{{ persona.obraSocial }}" id="obra">
+            </div>
+            <div class="p-2">
+                <label for="afiliado" class="form-label">Número de afiliado:</label>
+                <input type="text" class="form-control " value="{{ persona.afiliado }}" id="afiliado">
+            </div>
+        </div>{% endif %}
+        <div class="d-flex flex-row"> 
+            <div class="p-2">
+                <label for="obra2" class="form-label">Obra social 2:</label>
+                <input type="text" class="form-control " value="{{ persona.obraSocial2 }}" id="obra2">
+            </div>
+            <div class="p-2">
+                <label for="afiliado2" class="form-label">Número de afiliado 2:</label>
+                <input type="text" class="form-control " value="{{ persona.afiliado2 }}" id="afiliado2">
+            </div>
+        </div>
+        <div class="d-flex flex-row"> 
+            <div class="p-2">
+                <label for="peso" class="form-label">Peso:</label>
+                <input type="number" class="form-control " value="{{ persona.peso|stringformat:".2f" }}" id="peso">
+            </div>
+            <div class="p-2">
+                <label for="altura" class="form-label">Altura:</label>
+                <input type="number" class="form-control " value="{{ persona.altura|stringformat:".2f" }}" id="altura">
+            </div>
+        </div>
+        <div class="d-flex flex-row"> 
+            <div class="p-2">
+                <label for="extra" class="form-label">Dato extra:</label>
+                <input type="text" class="form-control " value="{{ persona.extras }}" id="extra">
+            </div>
+            <div class="p-2">
+                <label for="grupo" class="form-label">Grupo sanguíneo:</label>
+                <input type="text" class="form-control w-50" value="{{ persona.sangre }}" id="sangre">
+            </div>
+        </div>
+    </div>
+    <div id="togglerVer" >Ver más ▼</div>
+</fieldset>

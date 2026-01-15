@@ -34,88 +34,7 @@
 						{{ form }}
 						<button class="btn btn-success w-25" name="cargarDatos">Cargar</button>
 					</form>
-					<fieldset disabled id="displayDatos">
-						<div class="p-2">
-							<label for="nacimiento" class="form-label">Nacimiento:</label>
-							<div class="d-flex flex-row align-items-end"> 
-								<input type="text" class="form-control w-50" value="{{ persona.nacimiento }}" id="nacimiento">
-								<label class="form-label ms-3">{{ edadHoy }} años</label>
-							</div>
-						</div>
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
-								<label for="dni" class="form-label">DNI:</label>
-								<input type="text" class="form-control" value="{{ persona.dni }}" id="dni">
-							</div>
-							<div class="p-2">
-								<label for="afiliado" class="form-label">Sexo:</label>
-								<input type="text" class="form-control w-25" value="{{ persona.sexo }}" id="sexo">
-							</div>
-						</div>
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
-								<label for="tel" class="form-label">Teléfono:</label>
-								<input type="text" class="form-control " value="{{ persona.telefono }}" id="tel">
-							</div>
-							<div class="p-2">
-								<label for="email" class="form-label">Email:</label>
-								<input type="text" class="form-control " value="{{ persona.email }}" id="email">
-							</div>
-						</div>
-						<div class="d-flex flex-row"> 
-							<div class="p-2">
-								<label for="localidad" class="form-label">Localidad:</label>
-								<input type="text" class="form-control " value="{{ persona.localidad }}" id="localidad">
-							</div>
-							<div class="p-2">
-								<label for="ocupacion" class="form-label">Ocupacion:</label>
-								<input type="text" class="form-control " value="{{ persona.ocupacion }}" id="ocupacion">
-							</div>
-						</div>
-						<div id="extraFields" style="visibility: hidden; position: absolute">
-							<div class="d-flex flex-row"> 
-								<div class="p-2">
-									<label for="obra" class="form-label">Obra social:</label>
-									<input type="text" class="form-control " value="{{ persona.obraSocial }}" id="obra">
-								</div>
-								<div class="p-2">
-									<label for="afiliado" class="form-label">Número de afiliado:</label>
-									<input type="text" class="form-control " value="{{ persona.afiliado }}" id="afiliado">
-								</div>
-							</div>
-							<div class="d-flex flex-row"> 
-								<div class="p-2">
-									<label for="obra2" class="form-label">Obra social 2:</label>
-									<input type="text" class="form-control " value="{{ persona.obraSocial2 }}" id="obra2">
-								</div>
-								<div class="p-2">
-									<label for="afiliado2" class="form-label">Número de afiliado 2:</label>
-									<input type="text" class="form-control " value="{{ persona.afiliado2 }}" id="afiliado2">
-								</div>
-							</div>
-							<div class="d-flex flex-row"> 
-								<div class="p-2">
-									<label for="peso" class="form-label">Peso:</label>
-									<input type="number" class="form-control " value="{{ persona.peso|stringformat:".2f" }}" id="peso">
-								</div>
-								<div class="p-2">
-									<label for="altura" class="form-label">Altura:</label>
-									<input type="number" class="form-control " value="{{ persona.altura|stringformat:".2f" }}" id="altura">
-								</div>
-							</div>
-							<div class="d-flex flex-row"> 
-								<div class="p-2">
-									<label for="extra" class="form-label">Dato extra:</label>
-									<input type="text" class="form-control " value="{{ persona.extras }}" id="extra">
-								</div>
-								<div class="p-2">
-									<label for="grupo" class="form-label">Grupo sanguíneo:</label>
-									<input type="text" class="form-control w-50" value="{{ persona.sangre }}" id="sangre">
-								</div>
-							</div>
-						</div>
-						<div id="togglerVer" >Ver más ▼</div>
-					</fieldset>
+					{% include "includes/_personal_display.html" %}
 					<button type="button" class="btn btn-outline-secondary float-end" placeholder="Copiar datos"></button>
 				</div>
 				<div class="p-2 paciente">
@@ -153,111 +72,9 @@
 							<button type="" class="btn saveIndicator" id="statusEntrada" disabled></button>
 						</div>
 
-						<form method="post">
-							{% csrf_token %}
-							<div class="w-100 pb-2"><label class="label-1 p-1">Motivo consulta</label>{{ optica_form.motivo_consulta }}</div>
-							<div class="w-100 pb-2"><label class="label-1 p-1">Medicamentos</label>{{ optica_form.medicamentos }}</div>
-							<div class="w-100 pb-2"><label class="label-1 p-1">Antecedentes médicos </label>{{ optica_form.antec_medicos }}</div>
-							<div class="w-100 pb-1"><label class="label-1 p-1">Antecedentes oculares </label>{{ optica_form.antec_oculares }}</div>
-							<fieldset class="ps-3 pb-2 rounded-2" title="llantas actuales">
-								<legend>CC en uso Lejos</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.cc_uso_lej_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.cc_uso_lej_oi }}
-								</div>
-								<legend>CC en uso Cerca add</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.cc_uso_cer_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.cc_uso_cer_oi }}
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>Autorrefractometría</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD </label>{{ optica_form.akr_od }}
-									<label class="label-2 p-1">OI </label>{{ optica_form.akr_oi }}
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>Queratometría</legend>
-								<div class="w-100 d-flex align-items-center" id="subjetivo">
-									<div class="flex-fill">
-										<div class="w-100 pb-2"><label class="label-1 p-1">OD</label>{{ optica_form.quera_od }}</div>
-										<div class="w-100"><label class="label-1 p-1">OI</label>{{ optica_form.quera_oi }}</div>
-									</div>
-									<div class="flex-fill">
-										<div class="w-100 pb-2"><label class="label-1 p-1" title="Astigmatismo corneal">Ast</label>{{ optica_form.quera_od_ast }}</div>
-										<div class="w-100"><label class="label-1 p-1" title="Astigmatismo corneal">Ast</label>{{ optica_form.quera_oi_ast }}</div>
-									</div>
-									<div class="flex-fill hidden">
-										<div class="w-100"><label class="label-1 p-1">Nada</label><input></div>
-									</div>
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend title="Agudeza visual sin corrección">AV/SC</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.av_sc_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.av_sc_oi }}
-									<label class="label-2 p-1">AO</label>{{ optica_form.av_sc_ao }}
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend title="Agudeza visual con corrección">AV/CC en uso</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.av_cc_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.av_cc_oi }}
-									<label class="label-2 p-1">AO</label>{{ optica_form.av_cc_ao }}
-								</div>
-							</fieldset>
-							<div class="w-100 mt-2 mb-1"><label class="label-1-doble p-1">Observaciones segmento anterior y posterior</label>{{ optica_form.obs_segmento }}</div>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>Retinoscopia</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.retinoscopia_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.retinoscopia_oi }}
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>Subjetivo / afinación</legend>
-								<div class="w-100 d-flex align-items-center" id="subjetivo">
-									<div class="flex-fill">
-										<div class="w-100 pb-2"><label class="label-1 p-1">OD</label>{{ optica_form.subjetivo_od }}</div>
-										<div class="w-100"><label class="label-1 p-1">OI</label>{{ optica_form.subjetivo_oi }}</div>
-									</div>
-									<div class="flex-fill">
-										<div class="w-100 pb-2"><label class="label-1 p-1">AV OD</label>{{ optica_form.subjetivo_av_od }}</div>
-										<div class="w-100"><label class="label-1 p-1">AV OI</label>{{ optica_form.subjetivo_av_oi }}</div>
-									</div>
-									<div class="flex-fill">
-										<div class="w-100"><label class="label-1 p-1">AV AO</label>{{ optica_form.subjetivo_av_ao }}</div>
-									</div>
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>ADD</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.add_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.add_oi }}
-								</div>
-							</fieldset>
-							<fieldset class="ps-3 pb-2 rounded-2">
-								<legend>Formula final Lejos</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.formula_lej_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.formula_lej_oi }}
-								</div>
-								<legend>Formula final Cerca add</legend>
-								<div class="w-100">
-									<label class="label-2 p-1">OD</label>{{ optica_form.formula_cer_od }}
-									<label class="label-2 p-1">OI</label>{{ optica_form.formula_cer_oi }}
-								</div>
-							</fieldset>
-							<div class="w-100 mt-2 mb-1"><label class="label-1-doble p-1">Observaciones generales y remisiones</label>{{ optica_form.obs_generales }}</div>
-							<button type="submit" name="cargaOptica" class="btn btn-success m-2 w-25">Guardar</button>
-						</form>
-
-						<textarea class="form-control detalle hiddenn" id="entradaHoy" aria-label="With textarea" placeholder="Escribir aquí la historia clínica del día {{ diaElegido|date:'l, j F Y' }}">{{ entradaElegida.comentarios }}</textarea>
+						{% if APP_FLAVOR == 'OPTICAL' %}{% include "includes/_optical_form.html" %}
+						{% else %}<textarea class="form-control detalle" id="entradaHoy" aria-label="With textarea" placeholder="Escribir aquí la historia clínica del día {{ diaElegido|date:'l, j F Y' }}">{{ entradaElegida.comentarios }}</textarea>{% endif %}
+						
 						<form method="POST" action="/perfil/{{persona.id}}" id="cargaImg" enctype="multipart/form-data">
 							{% csrf_token %}
 							<input type="" name="fecha" required id="id_fecha" value="{{ diaElegido|date:'Y-m-d' }}" class="hiddenn">
@@ -284,29 +101,10 @@
 					{% for entrada in entradas %}
 					<div class="p-2 entrada">
 						<p class="titulo" style="margin-bottom: .5rem;">{{ entrada.fecha|date:"l, j F Y" }}</p>
-						<div class="d-flex">
-							<div style="width: 50%; margin-right: .5rem;">
-								{% if entrada.motivo_consulta %}<h5>Motivo Consulta</h5><span>{{entrada.motivo_consulta}}</span>{% endif %}
-								{% if entrada.medicamentos %}<h5>Medicamentos</h5><span>{{entrada.medicamentos}}</span>{% endif %}
-								{% if entrada.antec_medicos %}<h5>Antecedentes Médicos</h5><span>{{entrada.antec_medicos}}</span>{% endif %}
-								{% if entrada.antec_oculares %}<h5>Antecedentes Oculares</h5><span>{{entrada.antec_oculares}}</span>{% endif %}
-								{% if entrada.obs_segmento %}<h5>Observaciones segmento anterior y posterior</h5><span>{{entrada.obs_segmento}}</span>{% endif %}
-								{% if entrada.obs_generales %}<h5>Observaciones generales y remisiones</h5><span>{{entrada.obs_generales}}</span>{% endif %}
-							</div>
-							<div class="w-50 mediciones">
-								{% if entrada.cc_uso %}<h5>CC en uso</h5><b>  Lejos OD: </b><span>{{entrada.cc_uso.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.cc_uso.lejos_OI}}</span><br><b>Cerca add OD: </b><span>{{entrada.cc_uso.cerca_OD}}</span><b>Cerca add OI: </b><span>{{entrada.cc_uso.cerca_OI}}</span>{% endif %}
-								{% if entrada.akr %}<h5>Autorrefractometría</h5><b>OD: </b><span>{{entrada.akr.OD}}</span><b>  OI: </b><span>{{entrada.akr.OI}}</span>{% endif %}
-								{% if entrada.queratometria %}<h5>Queratometría</h5><b>  OD: </b><span>{{entrada.queratometria.OD}}</span><b>Ast: </b><span>{{entrada.queratometria.OD_ast}}</span><br><b>OI: </b><span>{{entrada.queratometria.OI}}</span><b>Ast: </b><span>{{entrada.queratometria.OI_ast}}</span>{% endif %}
-								{% if entrada.av_sc %}<h5>AV/SC</h5><b>OD: </b><span>{{entrada.av_sc.OD}}</span><b>  OI: </b><span>{{entrada.av_sc.OI}}</span><b>  AO: </b><span>{{entrada.av_sc.AO}}</span>{% endif %}
-								{% if entrada.av_cc %}<h5>AV/CC</h5><b>OD: </b><span>{{entrada.av_cc.OD}}</span><b>  OI: </b><span>{{entrada.av_cc.OI}}</span><b>  AO: </b><span>{{entrada.av_cc.AO}}</span>{% endif %}
-								{% if entrada.retinoscopia %}<h5>Retinoscopia</h5><b>OD: </b><span>{{entrada.retinoscopia.OD}}</span><b>  OI: </b><span>{{entrada.retinoscopia.OI}}</span>{% endif %}
-								{% if entrada.subjetivo %}<h5>Subjetivo / afinación</h5><b>OD: </b><span>{{entrada.subjetivo.OD}}</span><b>  OI: </b><span>{{entrada.subjetivo.OI}}</span><br><b>  AV OD: </b><span>{{entrada.subjetivo.AV_OD}}</span><b>  AV OI: </b><span>{{entrada.subjetivo.AV_OI}}</span><b>  AV AO: </b><span>{{entrada.subjetivo.AV_AO}}</span>{% endif %}
-								{% if entrada.add %}<h5>ADD</h5><b>OD: </b><span>{{entrada.add.OD}}</span><b>  OI: </b><span>{{entrada.add.OI}}</span>{% endif %}
-								{% if entrada.formula %}<h5>Formula final</h5><b>  Lejos OD: </b><span>{{entrada.formula.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.formula.lejos_OI}}</span><br><b>Cerca add OD: </b><span>{{entrada.formula.cerca_OD}}</span><b>Cerca add OI: </b><span>{{entrada.formula.cerca_OI}}</span>{% endif %}
-							</div>
-						</div>
 
-						<textarea class="form-control detalle mb-2 hiddenn" aria-label="With textarea" placeholder="Vacia" disabled>{{ entrada.comentarios }}</textarea>
+						{% if APP_FLAVOR == 'OPTICAL' %}{% include "includes/_optical_display.html" %}
+						{% else %}<textarea class="form-control detalle mb-2" aria-label="With textarea" placeholder="Vacia" disabled>{{ entrada.comentarios }}</textarea>{% endif %}
+						
 						<div class="d-flex justify-content-between">
 							{% if entrada.imagenes.all %}
 							<div {% if entrada.archivos.all %} style="max-width: 50%;" {% endif %}>

@@ -63,7 +63,7 @@ function inputListener(timeout, elementStatus, path) {
 }
 
 document.getElementById('comentarios').addEventListener("input", inputListener(timeout1, 'status', '/comentarios'));
-document.getElementById('entradaHoy').addEventListener("input", inputListener(timeout2, 'statusEntrada', '/entrada'));
+document.getElementById('entradaHoy')?.addEventListener("input", inputListener(timeout2, 'statusEntrada', '/entrada'));
 
 let timeout3 = null;
 editDateElement.addEventListener("change", function() {

@@ -83,7 +83,7 @@ def about(request):
 
     
     if request.method == 'POST': # todo ponerlo en una url mas descriptiva
-        # actualizar programa
+        # actualizar programa, el server se reinicia solo al actualizar archivos
         if 'pull' in request.POST:
             forzarBackup()
             subprocess.run(['git', 'pull'])

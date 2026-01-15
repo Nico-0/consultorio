@@ -34,6 +34,9 @@ ALLOWED_HOSTS.append(localip)
 qrimg = qrcode.make('http://'+localip+':8000')
 qrimg.save("historia/static/qrip.png")
 
+# Options: 'GENERAL', 'OPTICAL'
+APP_FLAVOR = 'OPTICAL'
+
 # Custom settings
 BACKUP_LOCATION = "backups/"    # "C:\\backupsConsultorio\\"
 DRIVE_FOLDER_ID = ""
@@ -74,7 +77,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'historia.backup.session_status'
+                'historia.backup.session_status',
+                'historia.apps.flavor'
             ],
         },
     },

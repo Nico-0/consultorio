@@ -1,0 +1,21 @@
+<div class="d-flex">
+    <div style="width: 50%; margin-right: .5rem;">
+        {% if entrada.motivo_consulta %}<h5>Motivo Consulta</h5><span>{{entrada.motivo_consulta}}</span>{% endif %}
+        {% if entrada.medicamentos %}<h5>Medicamentos</h5><span>{{entrada.medicamentos}}</span>{% endif %}
+        {% if entrada.antec_medicos %}<h5>Antecedentes Médicos</h5><span>{{entrada.antec_medicos}}</span>{% endif %}
+        {% if entrada.antec_oculares %}<h5>Antecedentes Oculares</h5><span>{{entrada.antec_oculares}}</span>{% endif %}
+        {% if entrada.obs_segmento %}<h5>Observaciones segmento anterior y posterior</h5><span>{{entrada.obs_segmento}}</span>{% endif %}
+        {% if entrada.obs_generales %}<h5>Observaciones generales y remisiones</h5><span>{{entrada.obs_generales}}</span>{% endif %}
+    </div>
+    <div class="w-50 mediciones">
+        {% if entrada.cc_uso %}<h5>CC en uso</h5><b>  Lejos OD: </b><span>{{entrada.cc_uso.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.cc_uso.lejos_OI}}</span><br><b>Cerca add OD: </b><span>{{entrada.cc_uso.cerca_OD}}</span><b>Cerca add OI: </b><span>{{entrada.cc_uso.cerca_OI}}</span>{% endif %}
+        {% if entrada.akr %}<h5>Autorrefractometría</h5><b>OD: </b><span>{{entrada.akr.OD}}</span><b>  OI: </b><span>{{entrada.akr.OI}}</span>{% endif %}
+        {% if entrada.queratometria %}<h5>Queratometría</h5><b>  OD: </b><span>{{entrada.queratometria.OD}}</span><b>Ast: </b><span>{{entrada.queratometria.OD_ast}}</span><br><b>OI: </b><span>{{entrada.queratometria.OI}}</span><b>Ast: </b><span>{{entrada.queratometria.OI_ast}}</span>{% endif %}
+        {% if entrada.av_sc %}<h5>AV/SC</h5><b>OD: </b><span>{{entrada.av_sc.OD}}</span><b>  OI: </b><span>{{entrada.av_sc.OI}}</span><b>  AO: </b><span>{{entrada.av_sc.AO}}</span>{% endif %}
+        {% if entrada.av_cc %}<h5>AV/CC</h5><b>OD: </b><span>{{entrada.av_cc.OD}}</span><b>  OI: </b><span>{{entrada.av_cc.OI}}</span><b>  AO: </b><span>{{entrada.av_cc.AO}}</span>{% endif %}
+        {% if entrada.retinoscopia %}<h5>Retinoscopia</h5><b>OD: </b><span>{{entrada.retinoscopia.OD}}</span><b>  OI: </b><span>{{entrada.retinoscopia.OI}}</span>{% endif %}
+        {% if entrada.subjetivo %}<h5>Subjetivo / afinación</h5><b>OD: </b><span>{{entrada.subjetivo.OD}}</span><b>  OI: </b><span>{{entrada.subjetivo.OI}}</span><br><b>  AV OD: </b><span>{{entrada.subjetivo.AV_OD}}</span><b>  AV OI: </b><span>{{entrada.subjetivo.AV_OI}}</span><b>  AV AO: </b><span>{{entrada.subjetivo.AV_AO}}</span>{% endif %}
+        {% if entrada.add %}<h5>ADD</h5><b>OD: </b><span>{{entrada.add.OD}}</span><b>  OI: </b><span>{{entrada.add.OI}}</span>{% endif %}
+        {% if entrada.formula %}<h5>Formula final</h5><b>  Lejos OD: </b><span>{{entrada.formula.lejos_OD}}</span><b>Lejos OI: </b><span>{{entrada.formula.lejos_OI}}</span><br><b>Cerca add OD: </b><span>{{entrada.formula.cerca_OD}}</span><b>Cerca add OI: </b><span>{{entrada.formula.cerca_OI}}</span>{% endif %}
+    </div>
+</div>
