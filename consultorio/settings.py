@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import socket
 import qrcode
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,15 +33,21 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 localip = (lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] #socket.gethostbyname(socket.gethostname())
 ALLOWED_HOSTS.append(localip)
 qrimg = qrcode.make('http://'+localip+':8000')
-qrimg.save("historia/static/qrip.png")
+qrimg.save(BASE_DIR / "historia/static/qrip.png")
 
-# Options: 'GENERAL', 'OPTICAL'
-APP_FLAVOR = 'OPTICAL'
 
 # Custom settings
-BACKUP_LOCATION = "backups/"    # "C:\\backupsConsultorio\\"
-DRIVE_FOLDER_ID = ""
-SHOW_GIT_VERSIONS = True
+env = environ.Env()
+env.read_env('.env', parse_comments=True)
+
+APP_FLAVOR = env('APP_FLAVOR') # Options: 'GENERAL', 'OPTICAL'
+BACKUP_LOCATION = env('BACKUP_LOCATION') # "C:\\backupsConsultorio\\"
+DRIVE_FOLDER_ID = env('DRIVE_FOLDER_ID')
+SHOW_GIT_VERSIONS = env('SHOW_GIT_VERSIONS')
+DATABASE = env('DATABASE')
+DAYS_LOCAL_FREQ = int(env('DAYS_LOCAL_FREQ'))
+DAYS_ONLINE_FREQ = int(env('DAYS_ONLINE_FREQ'))
+
 
 # Application definition
 
@@ -93,7 +100,7 @@ WSGI_APPLICATION = 'consultorio.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': 'db.sqlite3',
     }
 }
 
@@ -136,7 +143,7 @@ STATIC_URL = 'static/'
 
 MEDIA_URL = "files/"
 
-MEDIA_ROOT = BASE_DIR / "media"     # "C:\\mediaConsultorio"
+MEDIA_ROOT = env('MEDIA_ROOT')   # "media"  "C:\\mediaConsultorio"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

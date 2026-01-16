@@ -8,3 +8,7 @@ credentials.json
 media/
 historia/static/qrip.png
 drive_folder_id.txt
+.env
+build/
+dist/
+node_modules/

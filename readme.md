@@ -8,6 +8,8 @@
 - `pip install python-dateutil`
 - `pip install pillow-heif`
 - `pip install qrcode`
+- `pip install django-environ`
+- Rename `.env.example` to `.env`
 - `python manage.py makemigrations`
 - `python manage.py migrate`
 
@@ -20,12 +22,30 @@
 - Set authorized origins to `http://localhost:8080` and authorized redirect to `http://localhost:8080/`
 - Download and place `client_secrets.json` at the root of this server.
 - [Create a new test user](https://console.cloud.google.com/auth/audience) with your desired email.
-- Copy the ID of any Drive folder from the URL, and place it in `DRIVE_FOLDER_ID` inside `consultorio/settings.py` or inside `drive_folder_id.txt`.
+- Copy the ID of any Drive folder from the URL, and place it in `DRIVE_FOLDER_ID` inside `.env` or inside `drive_folder_id.txt`.
 
 ## Run the program
 
-- Setup app flavor, `OPTICAL` or `GENERAL` inside `consultorio/settings.py`
+- Setup app flavor, `OPTICAL` or `GENERAL` inside `.env`
 - `python manage.py runserver 0.0.0.0:8000`
+
+## Desktop Standalone (Windows)
+
+#### Compile with pyinstaller (optional if desired to run from another computer without Python)
+
+- `pyinstaller manage.py --onedir`
+- Place all mentioned custom files next to `manage.exe` file and `_internal` folder. (The new root)
+- Run with `manage.exe runserver 0.0.0.0:8000 --noreload`
+
+#### Run from Electron
+
+- `npm install`
+- Run with `npm run consultorio`
+- (Custom shortcut): `powershell.exe -WindowStyle Hidden -Command "npm --prefix C:\consultorio run consultorio"`
+
+#### (To do) Compile with Electron Forge
+
+- (To test)
 
 ### Autorun
 

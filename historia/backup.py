@@ -22,11 +22,13 @@ import json
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = 'service_account.json'
-filename = "db.sqlite3"
+filename = settings.DATABASE
 mimeType = 'application/x-7z-compressed'
 BACKUP_TIMESTAMP_FILE = './last_backup.txt'
 DRIVE_FOLDER_ID_FILE = './drive_folder_id.txt'
 BACKUP_LOCATION = settings.BACKUP_LOCATION
+days_local_freq = settings.DAYS_LOCAL_FREQ
+days_online_freq = settings.DAYS_ONLINE_FREQ
 
 DRIVE_LOGIN = False
 
@@ -121,8 +123,6 @@ def checkBackup():
     rutinaBackup(gauth)
 
 def rutinaBackup(creds):
-    days_local_freq = 1
-    days_online_freq = 2
     backupFile = None
     newHash = None
 
