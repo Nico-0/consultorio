@@ -12,3 +12,4 @@ drive_folder_id.txt
 build/
 dist/
 node_modules/
+venv/

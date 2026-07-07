@@ -61,6 +61,13 @@ p b {
 	width: 500px;
 }
 
+.datos p{
+	max-width: 44vw;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 @media (width <= 920px) {
 	div p{
 		margin-bottom: 0px;

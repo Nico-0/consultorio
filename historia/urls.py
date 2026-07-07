@@ -12,6 +12,8 @@ urlpatterns = [
     path('perfil/<int:persona_id>/comentarios', views.comentarios, name='comentarios'),
     path('perfil/<int:persona_id>/entrada', views.entrada, name='entrada'),
     path('perfil/<int:persona_id>/activo', views.activo, name='activo'),
+    path('imagenes/<int:img_id>', views.imagen, name='imagen'),
+    path('archivos/<int:file_id>', views.archivo, name='archivo'),
 ]
 
 from django.conf import settings

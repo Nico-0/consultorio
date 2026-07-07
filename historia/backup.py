@@ -25,7 +25,8 @@ SERVICE_ACCOUNT_FILE = 'service_account.json'
 filename = settings.DATABASE
 mimeType = 'application/x-7z-compressed'
 BACKUP_TIMESTAMP_FILE = './last_backup.txt'
-DRIVE_FOLDER_ID_FILE = './drive_folder_id.txt'
+DRIVE_FOLDER_ID_FILE = './drive_folder_id.txt' # Si no existe id de la carpeta entonces el server devuelve error File not Found - ID
+TEMP_CREDENTIALS_FILE = './credentials.json'
 BACKUP_LOCATION = settings.BACKUP_LOCATION
 days_local_freq = settings.DAYS_LOCAL_FREQ
 days_online_freq = settings.DAYS_ONLINE_FREQ
@@ -57,7 +58,7 @@ def upload_file_service_account():
 def check_creds():
     try:
         gauth = GoogleAuth()
-        gauth.LoadCredentialsFile("credentials.json")
+        gauth.LoadCredentialsFile(TEMP_CREDENTIALS_FILE)
         gauth.Authorize()
         return gauth
     except AuthenticationError: 
@@ -68,7 +69,7 @@ def auth():
         gauth = GoogleAuth()
         gauth.LocalWebserverAuth() # abre ventana y bloquea el programa
     except RefreshError:
-        os.remove("./credentials.json")
+        os.remove(TEMP_CREDENTIALS_FILE)
         gauth = GoogleAuth()
         gauth.LocalWebserverAuth()
     return gauth    
@@ -156,7 +157,6 @@ def rutinaBackup(creds):
 
 def backupLocal(last_backup_hash):
     try:
-        os.makedirs(BACKUP_LOCATION, exist_ok=True)
         compressed = shutil.make_archive(BACKUP_LOCATION+get_nameTime(), "zip", ".", filename)
         new_backup_hash = hashlib.md5(open(compressed,'rb').read()).hexdigest()
         if((new_backup_hash != last_backup_hash) or last_backup_hash is None):

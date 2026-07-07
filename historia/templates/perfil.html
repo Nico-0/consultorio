@@ -81,18 +81,33 @@
 							<input type="file" class="form-control" id="myinputfile" name="archivo" required id="id_archivo">
 							<button class="btn btn-outline-primary" id="btn-upload" name="cargaArchivo">Subir archivo</button>
 						</form>
-						<div class="d-flex justify-content-between">
+						<div class="d-flex justify-content-between mt-2">
 							{% if imagenes %}
 							<div {% if archivos %} style="max-width: 50%;" {% endif %}>
 								{% for img in imagenes %}
-									<a href="{{img.archivo.url}}" target="_blank"><img src="{{img.archivo.url}}" class="miniatura"></a>
+									<a href="{{img.archivo.url}}" target="_blank" class="img-container"><img src="{{img.archivo.url}}" class="miniatura">
+										<form method="POST" action="/imagenes/{{img.id}}" class="d-inline">
+											{% csrf_token %}
+											<button class="p-0 border-0 bg-transparent shadow-none d-block" name="borrar" onclick="return confirm('Desea borrar {{img.filename}}?')">
+												<i class="las la-trash trash over-img"></i>
+											</button>
+										</form>
+									</a>
 								{% endfor %}
 							</div>
 							{% endif %}
 							{% if archivos %}
 							<div style="max-width: 50%;">
 								{% for file in archivos %}
-									<span><a href="{{file.archivo.url}}" target="_blank" style="display: block;">{{file.filename}}</a></span>
+									<span style="display: block;">
+										<form method="POST" action="/archivos/{{file.id}}" style="display: inline-block">
+											{% csrf_token %}
+											<button class="p-0 border-0 bg-transparent shadow-none" name="borrar" onclick="return confirm('Desea borrar {{file.filename}}?')">
+												<i class="las la-trash trash"></i>
+											</button>
+										</form>
+										<a href="{{file.archivo.url}}" target="_blank" style="display: inline-block;">{{file.filename}}</a>
+									</span>
 								{% endfor %}
 							</div>
 							{% endif %}

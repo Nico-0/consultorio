@@ -43,8 +43,8 @@
 		{% for persona in personas %}
 		<a class="p-2 paciente" href="{% url 'perfil' persona.id %}">
 			<p class="titulo" style="text-align: center;">{{ persona.apellido }}, {{ persona.nombre }}</p>
-			<div class="d-flex flex-column flex-wrap column-gap-2 datos">
-				<p><b>Nacimiento</b>: {{ persona.nacimiento }}</p>
+			<div class="d-flex flex-column flex-wrap column-gap-1 column-gap-md-2 datos">
+				<p><b>Nacido</b>: {{ persona.nacimiento }}</p>
 				{% if persona.dni %}<p><b>DNI</b>: {{ persona.dni }}</p>{% endif %}
 				{% if persona.sexo %}<p><b>Sexo</b>: {{ persona.sexo }}</p>{% endif %}
 				{% if persona.obraSocial %}<p><b>Obra Social</b>: {{ persona.obraSocial }}</p>{% endif %}
@@ -57,7 +57,7 @@
 				{% if persona.ocupacion %}<p><b>Ocupacion</b>: {{ persona.ocupacion }}</p>{% endif %}
 				{% if persona.extras %}<p><b>Extras</b>: {{ persona.extras }}</p>{% endif %}
 			</div>
-			<p style="text-align: right; font-size: 0.7em; margin-bottom: 0;">Datos actualizados: {{ persona.modificado }}</p>
+			<p style="text-align: right; font-size: 0.7em; margin-bottom: 0;">{{ persona.modificado }}</p>
 		</a>
         {% endfor %}
 	</div>

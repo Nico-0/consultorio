@@ -153,14 +153,15 @@ input.cajita{
 .label-1{
 	width: 20%;
 	vertical-align: middle;
-	white-space: nowrap;
+	/*white-space: nowrap;*/
 	text-align: right;
+	min-width: max-content;
 }
 
 .label-1-doble{
 	width: 20%;
 	vertical-align: middle;
-	-webkit-line-clamp: 2;
+	-webkit-line-clamp: 3;
 	display: -webkit-inline-box;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
@@ -172,6 +173,7 @@ input.cajita{
 	vertical-align: middle;
 	white-space: nowrap;
 	text-align: right;
+	min-width: max-content;
 }
 
 #subjetivo .cajita{
@@ -199,11 +201,54 @@ div h5 {
 }
 
 .mediciones span{
-	margin-right: 1rem;
+	margin-right: 0.89rem;
+	white-space: pre;
 }
 
 .mediciones b{
 	font-weight: 500;
+	white-space: pre-line;
+	display: inline-block;
+	padding-right: 2px;
+}
+
+.img-container{
+	position: relative;
+	display: inline-block;
+}
+
+.over-img{
+	position: absolute;
+    bottom: 2px;
+    right: 0px;
+}
+
+.trash{
+	font-size: 24px;
+	color: black;
+}
+
+.trash:hover{
+	background-color: firebrick;
+	border-radius: 15px;
+}
+
+.text label{
+	min-width: unset;
+}
+
+.input-entrada {
+  container-type: inline-size;
+  container-name: formEntrada;
+}
+
+.entrada-optica{
+	width: 50%;
+}
+@media (width < 576px) {
+	.entrada-optica{
+		width: 100%;
+	}
 }
 
 @media (width <= 920px) {
@@ -216,5 +261,19 @@ div h5 {
 	}
 	.widthBoton{
 		width: 6em;
+	}
+}
+
+@container formEntrada (width <= 440px) {
+  .text label{
+		display: block;
+		width: 100%;
+		text-align: unset;
+	}
+}
+
+@container formEntrada (width <= 816px) {
+	#subjetivo .cajita{
+		width: 100%;
 	}
 }

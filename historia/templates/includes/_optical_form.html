@@ -1,9 +1,9 @@
-<form method="post">
+<form method="post" class="input-entrada">
     {% csrf_token %}
-    <div class="w-100 pb-2"><label class="label-1 p-1">Motivo consulta</label>{{ optica_form.motivo_consulta }}</div>
-    <div class="w-100 pb-2"><label class="label-1 p-1">Medicamentos</label>{{ optica_form.medicamentos }}</div>
-    <div class="w-100 pb-2"><label class="label-1 p-1">Antecedentes médicos </label>{{ optica_form.antec_medicos }}</div>
-    <div class="w-100 pb-1"><label class="label-1 p-1">Antecedentes oculares </label>{{ optica_form.antec_oculares }}</div>
+    <div class="w-100 pb-2 text"><label class="label-1 p-1">Motivo consulta</label>{{ optica_form.motivo_consulta }}</div>
+    <div class="w-100 pb-2 text"><label class="label-1 p-1">Medicamentos</label>{{ optica_form.medicamentos }}</div>
+    <div class="w-100 pb-2 text"><label class="label-1 p-1">Antecedentes médicos </label>{{ optica_form.antec_medicos }}</div>
+    <div class="w-100 pb-1 text"><label class="label-1 p-1">Antecedentes oculares </label>{{ optica_form.antec_oculares }}</div>
     <fieldset class="ps-3 pb-2 rounded-2" title="llantas actuales">
         <legend>CC en uso Lejos</legend>
         <div class="w-100">
@@ -25,37 +25,32 @@
     </fieldset>
     <fieldset class="ps-3 pb-2 rounded-2">
         <legend>Queratometría</legend>
-        <div class="w-100 d-flex align-items-center" id="subjetivo">
-            <div class="flex-fill">
-                <div class="w-100 pb-2"><label class="label-1 p-1">OD</label>{{ optica_form.quera_od }}</div>
-                <div class="w-100"><label class="label-1 p-1">OI</label>{{ optica_form.quera_oi }}</div>
-            </div>
-            <div class="flex-fill">
-                <div class="w-100 pb-2"><label class="label-1 p-1" title="Astigmatismo corneal">Ast</label>{{ optica_form.quera_od_ast }}</div>
-                <div class="w-100"><label class="label-1 p-1" title="Astigmatismo corneal">Ast</label>{{ optica_form.quera_oi_ast }}</div>
-            </div>
-            <div class="flex-fill hidden">
-                <div class="w-100"><label class="label-1 p-1">Nada</label><input></div>
-            </div>
+        <div class="w-100 pb-2">
+            <label class="label-2 p-1">OD</label>{{ optica_form.quera_od }}
+            <label class="label-2 p-1">Ast</label>{{ optica_form.quera_od_ast }}
+        </div>
+        <div class="w-100">
+            <label class="label-2 p-1">OI</label>{{ optica_form.quera_oi }}
+            <label class="label-2 p-1">Ast</label>{{ optica_form.quera_oi_ast }}
         </div>
     </fieldset>
     <fieldset class="ps-3 pb-2 rounded-2">
         <legend title="Agudeza visual sin corrección">AV/SC</legend>
         <div class="w-100">
-            <label class="label-2 p-1">OD</label>{{ optica_form.av_sc_od }}
-            <label class="label-2 p-1">OI</label>{{ optica_form.av_sc_oi }}
-            <label class="label-2 p-1">AO</label>{{ optica_form.av_sc_ao }}
+            <div class="d-inline"><label class="label-2 p-1">OD</label>{{ optica_form.av_sc_od }}</div>
+            <div class="d-inline"><label class="label-2 p-1">OI</label>{{ optica_form.av_sc_oi }}</div>
+            <div class="d-inline text-nowrap"><label class="label-2 p-1">AO</label>{{ optica_form.av_sc_ao }}</div>
         </div>
     </fieldset>
     <fieldset class="ps-3 pb-2 rounded-2">
         <legend title="Agudeza visual con corrección">AV/CC en uso</legend>
         <div class="w-100">
-            <label class="label-2 p-1">OD</label>{{ optica_form.av_cc_od }}
-            <label class="label-2 p-1">OI</label>{{ optica_form.av_cc_oi }}
-            <label class="label-2 p-1">AO</label>{{ optica_form.av_cc_ao }}
+            <div class="d-inline"><label class="label-2 p-1">OD</label>{{ optica_form.av_cc_od }}</div>
+            <div class="d-inline"><label class="label-2 p-1">OI</label>{{ optica_form.av_cc_oi }}</div>
+            <div class="d-inline text-nowrap"><label class="label-2 p-1">AO</label>{{ optica_form.av_cc_ao }}</div>
         </div>
     </fieldset>
-    <div class="w-100 mt-2 mb-1"><label class="label-1-doble p-1">Observaciones segmento anterior y posterior</label>{{ optica_form.obs_segmento }}</div>
+    <div class="w-100 mt-2 mb-1 text"><label class="label-1-doble p-1">Observaciones segmento anterior y posterior</label>{{ optica_form.obs_segmento }}</div>
     <fieldset class="ps-3 pb-2 rounded-2">
         <legend>Retinoscopia</legend>
         <div class="w-100">
@@ -98,6 +93,6 @@
             <label class="label-2 p-1">OI</label>{{ optica_form.formula_cer_oi }}
         </div>
     </fieldset>
-    <div class="w-100 mt-2 mb-1"><label class="label-1-doble p-1">Observaciones generales y remisiones</label>{{ optica_form.obs_generales }}</div>
+    <div class="w-100 mt-2 mb-1 text"><label class="label-1-doble p-1">Observaciones generales y remisiones</label>{{ optica_form.obs_generales }}</div>
     <button type="submit" name="cargaOptica" class="btn btn-success m-2 w-25">Guardar</button>
 </form>

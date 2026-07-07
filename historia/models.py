@@ -1,6 +1,10 @@
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.utils import timezone
 import os
+from django.conf import settings
+from send2trash import send2trash
 
 class Persona(models.Model):
     GENEROS = [
@@ -77,6 +81,10 @@ class Imagen(models.Model):
     entrada = models.ForeignKey(Entrada, on_delete=models.CASCADE, related_name='imagenes')
     archivo = models.ImageField(upload_to=directorio, null = True)
 
+    @property
+    def filename(self):
+        return os.path.basename(self.archivo.name)
+
 class Archivo(models.Model):
     entrada = models.ForeignKey(Entrada, on_delete=models.CASCADE, related_name='archivos')
     archivo = models.FileField(upload_to=directorio, null = True)
@@ -84,3 +92,12 @@ class Archivo(models.Model):
     @property
     def filename(self):
         return os.path.basename(self.archivo.name)
+
+@receiver(post_delete, sender=Imagen)
+@receiver(post_delete, sender=Archivo)
+def delete_file(sender, instance, **kwargs):
+    if instance.archivo:
+        if os.path.isfile(instance.archivo.path):
+            new_path = os.path.join(settings.RESTORED_TRASH_PATH, os.path.basename(instance.archivo.path))
+            os.rename(instance.archivo.path, new_path)  # delete file from trashed folder, keeps media folder clean when restoring file from trash bin 
+            send2trash(new_path)

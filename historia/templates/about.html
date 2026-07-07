@@ -44,6 +44,14 @@
         </tbody>
     </table>{% endif %}
 
+    <p>Pantalla: <span id="viewport-display">Measuring...</span></p>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const displayElement = document.getElementById("viewport-display");
+            displayElement.textContent = `${window.innerWidth}px x ${window.innerHeight}px`;
+        });
+    </script>
+
     <p>© Nico</p>
 
 </div>

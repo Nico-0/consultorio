@@ -47,6 +47,7 @@ SHOW_GIT_VERSIONS = env('SHOW_GIT_VERSIONS')
 DATABASE = env('DATABASE')
 DAYS_LOCAL_FREQ = int(env('DAYS_LOCAL_FREQ'))
 DAYS_ONLINE_FREQ = int(env('DAYS_ONLINE_FREQ'))
+RESTORED_TRASH_PATH = env('RESTORED_TRASH_PATH')
 
 
 # Application definition
@@ -67,11 +68,16 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'consultorio.urls'
+
+LOGIN_URL = '/admin/login/'
+SESSION_COOKIE_AGE = 315360000
+SESSION_SAVE_EVERY_REQUEST = True
 
 TEMPLATES = [
     {

@@ -329,6 +329,22 @@ def activo(request, persona_id):
             return JsonResponse({'status': 'persona not found'}, status=404)
     return redirect('/perfil/'+str(persona_id))
 
+def imagen(request, img_id):
+    if request.method == 'POST':
+        if 'borrar' in request.POST:
+            img = get_object_or_404(Imagen, id=img_id)
+            img.delete()
+            print(str(img_id) + " Deleted "+ img.filename)
+    return redirect(request.META.get('HTTP_REFERER'))
+
+def archivo(request, file_id):
+    if request.method == 'POST':
+        if 'borrar' in request.POST:
+            archivo = get_object_or_404(Archivo, id=file_id)
+            archivo.delete()
+            print(str(file_id) + " Deleted "+ archivo.filename)
+    return redirect(request.META.get('HTTP_REFERER'))
+
 def drivelogin(request):
     from .backup import checkBackup
     from .exceptions import GApiReqError

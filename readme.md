@@ -3,19 +3,16 @@
 ## Installation
 
 - [Install Git cli](https://git-scm.com/install) if support for the in-app update button is desired.
-- [Install Python 3.10.11](https://www.python.org/downloads/release/python-31011/)
-- `pip install django`
-- `pip install python-dateutil`
-- `pip install pillow-heif`
-- `pip install qrcode`
-- `pip install django-environ`
+- [Install Python 3.14.6](https://www.python.org/downloads/release/python-3146/)
+- `python -m venv venv`
+- `venv\Scripts\activate`
+- `pip install -r requirements.txt`
 - Rename `.env.example` to `.env`
-- `python manage.py makemigrations`
+- `python manage.py makemigrations` (already on repo)
 - `python manage.py migrate`
+- `python manage.py createsuperuser`
 
 ## Configure backups
-
-- `pip install pydrive`
 
 - In any Google Cloud project [configure Auth Platform](https://console.cloud.google.com/auth/branding). It's needed even for a local app of a single user.
 - [Enable Google Drive API](https://console.cloud.google.com/marketplace/product/google/drive.googleapis.com) and [create OAuth credentials](https://console.cloud.google.com/apis/credentials)
@@ -35,6 +32,8 @@
 
 - `pyinstaller manage.py --onedir`
 - Place all mentioned custom files next to `manage.exe` file and `_internal` folder. (The new root)
+- Copy `consultorio` and `historia` folders into `_internal` folder.
+- `manage.exe migrate`
 - Run with `manage.exe runserver 0.0.0.0:8000 --noreload`
 
 #### Run from Electron
