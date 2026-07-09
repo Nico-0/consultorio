@@ -1,9 +1,3 @@
-#pip install google-api-python-client
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-from googleapiclient.errors import HttpError
-from google.oauth2 import service_account
-
 #pip install pydrive
 from pydrive.auth import GoogleAuth, RefreshError, AuthenticationError
 from pydrive.drive import GoogleDrive
@@ -21,39 +15,20 @@ import hashlib
 import json
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-SERVICE_ACCOUNT_FILE = 'service_account.json'
-filename = settings.DATABASE
+#SERVICE_ACCOUNT_FILE = 'service_account.json'
+DATABASE = settings.DATABASE
+filename = DATABASE.name
+BASE_DIR = settings.BASE_DIR
 mimeType = 'application/x-7z-compressed'
-BACKUP_TIMESTAMP_FILE = './last_backup.txt'
-DRIVE_FOLDER_ID_FILE = './drive_folder_id.txt' # Si no existe id de la carpeta entonces el server devuelve error File not Found - ID
-TEMP_CREDENTIALS_FILE = './credentials.json'
+BACKUP_TIMESTAMP_FILE = BASE_DIR / 'last_backup.txt'
+DRIVE_FOLDER_ID_FILE = BASE_DIR / 'drive_folder_id.txt' # Si no existe id de la carpeta entonces el server devuelve error File not Found - ID
+TEMP_CREDENTIALS_FILE = BASE_DIR / 'credentials.json'
 BACKUP_LOCATION = settings.BACKUP_LOCATION
 days_local_freq = settings.DAYS_LOCAL_FREQ
 days_online_freq = settings.DAYS_ONLINE_FREQ
 
 DRIVE_LOGIN = False
 
-'''
-def authenticate():
-    creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-    return creds
-
-def upload_file_service_account():
-    creds = authenticate()
-    service = build('drive', 'v3', credentials=creds)
-
-    file_metadata = {
-        'name' : get_nameTime(),
-        'parents' : [settings.DRIVE_FOLDER_ID],
-        'mimeType': mimeType
-    }
-    
-    media_body = MediaFileUpload(filename, mimetype=mimeType)
-    file = service.files().create(
-        body=file_metadata, # nombre y carpeta
-        media_body=media_body # archivo a subir
-    ).execute()
-'''
 
 def check_creds():
     try:
@@ -130,9 +105,9 @@ def rutinaBackup(creds):
     # backup local
     try:
         last_backup_file = os.listdir(BACKUP_LOCATION)[::-1][0]
-        last_backup_hash = hashlib.md5(open(BACKUP_LOCATION+last_backup_file,'rb').read()).hexdigest()
+        last_backup_hash = hashlib.md5(open(BACKUP_LOCATION / last_backup_file,'rb').read()).hexdigest()
         print(f"Ultimo backup local: {last_backup_file}, '{last_backup_hash}'")
-        last_backup = timezone.datetime.fromtimestamp(os.path.getmtime(BACKUP_LOCATION+last_backup_file))
+        last_backup = timezone.datetime.fromtimestamp(os.path.getmtime(BACKUP_LOCATION / last_backup_file))
     except (FileNotFoundError, IndexError):
         last_backup = None
         last_backup_hash = None
@@ -157,7 +132,7 @@ def rutinaBackup(creds):
 
 def backupLocal(last_backup_hash):
     try:
-        compressed = shutil.make_archive(BACKUP_LOCATION+get_nameTime(), "zip", ".", filename)
+        compressed = shutil.make_archive(BACKUP_LOCATION / get_nameTime(), "zip", ".", DATABASE)
         new_backup_hash = hashlib.md5(open(compressed,'rb').read()).hexdigest()
         if((new_backup_hash != last_backup_hash) or last_backup_hash is None):
             print("Nuevo backup local: ", compressed, file=sys.stderr)
@@ -182,7 +157,7 @@ def backupOnline(backupFile, newHash, lastHash, creds):
     except FileNotFoundError:
         print("FileNotFoundError", file=sys.stderr)
     #except ServerNotFoundError as e: # ipconfig /flushdns
-    except HttpError as err:
+    except HttpError as err:    #TODO
         #print(err.resp, file=sys.stderr)
         print(err.content, file=sys.stderr)
     except ApiRequestError as e:
@@ -214,6 +189,29 @@ def session_status(request):
     }
 
 
+'''
+#pip install google-api-python-client
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from googleapiclient.errors import HttpError
+from google.oauth2 import service_account
+def authenticate():
+    creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    return creds
 
+def upload_file_service_account():
+    creds = authenticate()
+    service = build('drive', 'v3', credentials=creds)
 
-
+    file_metadata = {
+        'name' : get_nameTime(),
+        'parents' : [settings.DRIVE_FOLDER_ID],
+        'mimeType': mimeType
+    }
+    
+    media_body = MediaFileUpload(filename, mimetype=mimeType)
+    file = service.files().create(
+        body=file_metadata, # nombre y carpeta
+        media_body=media_body # archivo a subir
+    ).execute()
+'''

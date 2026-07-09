@@ -7,10 +7,6 @@
 - `python -m venv venv`
 - `venv\Scripts\activate`
 - `pip install -r requirements.txt`
-- Rename `.env.example` to `.env`
-- `python manage.py makemigrations` (already on repo)
-- `python manage.py migrate`
-- `python manage.py createsuperuser`
 
 ## Configure backups
 
@@ -23,30 +19,31 @@
 
 ## Run the program
 
-- Setup app flavor, `OPTICAL` or `GENERAL` inside `.env`
 - `python manage.py runserver 0.0.0.0:8000`
+- Database and env files will be created on first run. Follow createsuperuser prompts.
+- Setup app flavor, `OPTICAL` or `GENERAL` inside `.env`
 
-## Desktop Standalone (Windows)
+### Run from Electron
 
-#### Compile with pyinstaller (optional if desired to run from another computer without Python)
-
-- `pyinstaller manage.py --onedir`
-- Place all mentioned custom files next to `manage.exe` file and `_internal` folder. (The new root)
-- Copy `consultorio` and `historia` folders into `_internal` folder.
-- `manage.exe migrate`
-- Run with `manage.exe runserver 0.0.0.0:8000 --noreload`
-
-#### Run from Electron
-
+- Open `electron` folder.
 - `npm install`
 - Run with `npm run consultorio`
 - (Custom shortcut): `powershell.exe -WindowStyle Hidden -Command "npm --prefix C:\consultorio run consultorio"`
 
-#### (To do) Compile with Electron Forge
+## Desktop Standalone (Windows)
 
-- (To test)
+### Compile with pyinstaller (bundles Python to the app)
 
-### Autorun
+- `pyinstaller pyinstaller.spec`
+- Open `dist/manage` folder.
+- Run with `manage.exe runserver 0.0.0.0:8000 --noreload`
+
+### Compile with Electron Forge (bundles npm to the app)
+
+- `npm run make`
+- Check `out` folder for `consultorio.exe` or `Setup.exe`.
+
+#### Autorun
 
 > So far, this server is designed to run on the same computer as the client.
 > Windows task scheduler:
@@ -57,17 +54,9 @@
 - Start in field: `C:\consultorio`
 
 
-### Pending testing
+#### Pending
 
-- Disable debug mode in `consultorio/settings.py`
+- Disable Django debug mode. WhiteNoise serves static files but does not serve media files.
 
-### (Deprecated) Configure backups with service account (missing shared drive)
-
-- `pip install google-api-python-client`
-
-- In any Google Cloud project enable Google Drive API and [create a service account](https://console.cloud.google.com/iam-admin/serviceaccounts).
-- Place `service_account.json` at the root of this server.
-- In any Google Drive folder, share editor permissions with the service account's email.
-- Copy the ID of the folder from the URL, and place it in `DRIVE_FOLDER_ID` inside `consultorio/settings.py`.
 
 

@@ -12,6 +12,7 @@
         <img src="/static/qrip.png" style="width: 100px;">
     </div>
 
+    {% if showVersiones %} 
     <h2 class="text-center">Versión actual</h2>
 
     <span>Versión: {{version}}</span>
@@ -22,7 +23,6 @@
 		<button class="btn btn-outline-success mb-5" name="pull" {% if botonUpdate is False %}disabled{% endif %}>{{botonText}}</button>
 	</form>
 
-    {% if showVersiones %} 
     <h3 class="text-center mb-0">Lista de versiones:</h3>
 
     {{error}}

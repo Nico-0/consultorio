@@ -14,10 +14,25 @@ from pathlib import Path
 import socket
 import qrcode
 import environ
+import shutil
+import sys, os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+BUNDLE_DIR = BASE_DIR
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys.executable).resolve().parent
+    BUNDLE_DIR = Path(sys._MEIPASS)
+print(BASE_DIR)
 
+env_path = BASE_DIR / '.env'
+if not env_path.is_file():
+    shutil.copy(BUNDLE_DIR / '.env.example', env_path)
+
+def resolve_path(env_value):
+    path = Path(env_value)
+    if path.is_absolute(): return path
+    return BASE_DIR / path
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -33,7 +48,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 localip = (lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] #socket.gethostbyname(socket.gethostname())
 ALLOWED_HOSTS.append(localip)
 qrimg = qrcode.make('http://'+localip+':8000')
-qrimg.save(BASE_DIR / "historia/static/qrip.png")
+qrimg.save(BUNDLE_DIR / "historia/static/qrip.png")
 
 
 # Custom settings
@@ -41,14 +56,15 @@ env = environ.Env()
 env.read_env('.env', parse_comments=True)
 
 APP_FLAVOR = env('APP_FLAVOR') # Options: 'GENERAL', 'OPTICAL'
-BACKUP_LOCATION = env('BACKUP_LOCATION') # "C:\\backupsConsultorio\\"
+BACKUP_LOCATION = resolve_path(env('BACKUP_LOCATION')) # "C:\\backupsConsultorio\\"
 DRIVE_FOLDER_ID = env('DRIVE_FOLDER_ID')
-SHOW_GIT_VERSIONS = env('SHOW_GIT_VERSIONS')
-DATABASE = env('DATABASE')
+SHOW_GIT_VERSIONS = env.bool('SHOW_GIT_VERSIONS', default=False)
+DATABASE = resolve_path(env('DATABASE'))
 DAYS_LOCAL_FREQ = int(env('DAYS_LOCAL_FREQ'))
 DAYS_ONLINE_FREQ = int(env('DAYS_ONLINE_FREQ'))
 RESTORED_TRASH_PATH = env('RESTORED_TRASH_PATH')
 
+os.makedirs(DATABASE.parent, exist_ok=True)
 
 # Application definition
 
@@ -64,6 +80,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    #only for debug False, pyinstaller: --hidden-import=whitenoise --hidden-import=whitenoise.middleware
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,7 +100,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BUNDLE_DIR / 'historia' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,7 +115,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'consultorio.wsgi.application'
+#WSGI_APPLICATION = 'consultorio.wsgi.application'
 
 
 # Database
@@ -106,7 +124,7 @@ WSGI_APPLICATION = 'consultorio.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
+        'NAME': DATABASE,
     }
 }
 
@@ -147,9 +165,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'collectstatic'
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = "files/"
 
-MEDIA_ROOT = env('MEDIA_ROOT')   # "media"  "C:\\mediaConsultorio"
+MEDIA_ROOT = resolve_path(env('MEDIA_ROOT'))   # "media"  "C:\\mediaConsultorio"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

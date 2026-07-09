@@ -11,5 +11,6 @@ drive_folder_id.txt
 .env
 build/
 dist/
-node_modules/
 venv/
+electron/node_modules/
+electron/out/

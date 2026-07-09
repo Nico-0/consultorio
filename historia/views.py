@@ -52,8 +52,10 @@ def about(request):
     context['showVersiones'] = settings.SHOW_GIT_VERSIONS
     branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
     context['branch'] = branch
-    
     context['botonUpdate'] = False
+    context['botonText'] = 'Actualizar'
+
+    if(not settings.SHOW_GIT_VERSIONS): return render(request, 'about.html', context)
     gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True)
     if(gitcmd.returncode):
         context['version'] = context['botonText'] = 'Error de git' # Git no instalado o falta carpeta .git
