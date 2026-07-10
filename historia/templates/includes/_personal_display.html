@@ -18,11 +18,11 @@
     </div>
     <div class="d-flex flex-row"> 
         <div class="p-2">
-            <label for="tel" class="form-label">Teléfono:</label>
+            <label for="tel" class="form-label">Teléfono:</label> {% if persona.telefono %}<a href="https://wa.me/{{ persona.telefono }}" target="_blank"><i class="lab la-whatsapp"></i></a>{% endif %}
             <input type="text" class="form-control " value="{{ persona.telefono }}" id="tel">
         </div>
         <div class="p-2">
-            <label for="email" class="form-label">Email:</label>
+            <label for="email" class="form-label">Email:</label> {% if persona.email %}<a href="mailto:{{ persona.email }}"><i class="lar la-envelope"></i></a>{% endif %}
             <input type="text" class="form-control " value="{{ persona.email }}" id="email">
         </div>
     </div>

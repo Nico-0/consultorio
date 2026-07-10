@@ -28,18 +28,15 @@ function createWindow() {
   mainWindow.setAutoHideMenuBar(true); // Alt key
   console.log('--- App is ready and running! ---');
   
-  globalShortcut.register('CommandOrControl+Shift+G', () => {
+  globalShortcut.register('CommandOrControl+Shift+P', () => {
     mainWindow.isMenuBarVisible() ? mainWindow.setMenuBarVisibility(false) : mainWindow.setMenuBarVisibility(true)
     console.log('--- Shortcut! ---');
   });
   
-  globalShortcut.register('CommandOrControl+Shift+E', () => {
-    openExplorer(path.join(djangoDir, process.env.BACKUP_LOCATION)); // TODO check if BACKUP_LOCATION is full or relative path
-  });
-
-  globalShortcut.register('CommandOrControl+Shift+P', () => {
-    launchCmdPython(path.join(djangoDir, "a.py"));
-  });
+  globalShortcut.register('CommandOrControl+Shift+B', () => {openExplorer(process.env.BACKUP_LOCATION);});
+  globalShortcut.register('CommandOrControl+Shift+M', () => { openExplorer(process.env.MEDIA_ROOT); });
+  globalShortcut.register('CommandOrControl+Shift+T', () => { openExplorer(process.env.RESTORED_TRASH_PATH); });
+  globalShortcut.register('CommandOrControl+Shift+U', () => { launchCreateUser(); });
 
   // Load the Django URL
   setTimeout(() => {
@@ -88,13 +85,19 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
-    killDjango();
+  killDjango();
+});
+
+app.on('browser-window-created', (event, window) => {
+  window.setMenuBarVisibility(false);
+  window.setAutoHideMenuBar(true);
 });
 
 
 function openExplorer(targetPath) {
   const safePath = path.normalize(targetPath);
-  exec(`start "" "${safePath}"`, { shell: true }, (err) => {
+  const finalPath = path.isAbsolute(safePath) ? safePath : path.join(djangoDir, safePath);
+  exec(`start "" "${finalPath}"`, { shell: true }, (err) => {
     if (err) console.error('Failed to open explorer:', err);
   });
 }
@@ -103,6 +106,12 @@ function launchCmdPython(scriptPath) {
   const safeScriptPath = path.normalize(scriptPath);
   // Using /k keeps the command prompt window open so you can see errors or output
   const cmdArgs = ['/c', 'start', 'cmd', '/k', `python "${safeScriptPath}"`];
+  spawn('cmd.exe', cmdArgs, { shell: true });
+}
+
+function launchCreateUser() {
+  const managePath = app.isPackaged ? path.join(djangoDir, 'manage.exe') : "python " + path.join(djangoDir, 'manage.py');
+  const cmdArgs = ['/c', 'start', 'cmd', '/k', `"${managePath}" createsuperuser`];
   spawn('cmd.exe', cmdArgs, { shell: true });
 }
 

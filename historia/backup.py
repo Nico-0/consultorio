@@ -14,8 +14,6 @@ import shutil
 import hashlib
 import json
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
-#SERVICE_ACCOUNT_FILE = 'service_account.json'
 DATABASE = settings.DATABASE
 filename = DATABASE.name
 BASE_DIR = settings.BASE_DIR
@@ -143,6 +141,7 @@ def backupLocal(last_backup_hash):
             return None, None
     except FileNotFoundError:
         print("FileNotFoundError en backup local")
+        return None, None
 
 
 def backupOnline(backupFile, newHash, lastHash, creds):
@@ -157,9 +156,6 @@ def backupOnline(backupFile, newHash, lastHash, creds):
     except FileNotFoundError:
         print("FileNotFoundError", file=sys.stderr)
     #except ServerNotFoundError as e: # ipconfig /flushdns
-    except HttpError as err:    #TODO
-        #print(err.resp, file=sys.stderr)
-        print(err.content, file=sys.stderr)
     except ApiRequestError as e:
         raise GApiReqError(json.loads(e.args[0].content.decode("utf-8"))["error"]["message"])
     
@@ -175,10 +171,7 @@ def backupOnline(backupFile, newHash, lastHash, creds):
     
 def forzarBackup():
     gauth = auth()
-    try:
-        backupOnline(None, None, None, gauth)
-    except (GApiReqError, ServerNotFoundError) as e:
-        print(e)
+    backupOnline(None, None, None, gauth)
 
 def login_completed():
     global DRIVE_LOGIN; DRIVE_LOGIN = True
@@ -195,6 +188,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
+SCOPES = ['https://www.googleapis.com/auth/drive']
+SERVICE_ACCOUNT_FILE = 'service_account.json'
 def authenticate():
     creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
     return creds

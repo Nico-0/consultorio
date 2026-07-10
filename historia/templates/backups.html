@@ -3,6 +3,14 @@
 
 <h1 class="text-center">Backups</h1>
 
+{% if messages %}
+	{% for message in messages %}
+		<div class="alert alert-{{ message.tags }}" role="alert">
+			{% if message.tags %}{{ message.tags }}: {% endif %}{{ message }}
+		</div>
+	{% endfor %}
+{% endif %}
+
 <div class="d-flex flex-column mb-3 mt-5 padre align-items-center">
 
     <form method="POST" action="/backups/" id="cargaBackup">

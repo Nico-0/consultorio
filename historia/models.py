@@ -2,9 +2,33 @@ from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
-import os
+import os, re
 from django.conf import settings
 from send2trash import send2trash
+from django.db.models.lookups import IContains, Contains
+
+class DNIField(models.CharField):
+    def from_db_value(self, value, exp, conn): # Get value with dots formatting
+        if not value: return ""
+        reversed_str = str(value)[::-1]
+        chunks = [reversed_str[i:i+3] for i in range(0, len(reversed_str), 3)]
+        return ".".join(chunks)[::-1]
+
+    def get_prep_value(self, value): # Save value without dots
+        if isinstance(value, str):
+            return re.sub(r'[^a-zA-Z0-9]', '', value)
+        return value
+
+@DNIField.register_lookup
+class DNIIContains(IContains):
+    def get_prep_lookup(self):
+        if isinstance(self.rhs, str):
+            original_had_content = len(self.rhs.strip()) > 0
+            cleaned_value = re.sub(r'[^a-zA-Z0-9]', '', self.rhs)
+            if original_had_content and not cleaned_value:
+                self.rhs = "__IMPOSSIBLE_MATCH__"
+            else: self.rhs = cleaned_value
+        return super().get_prep_lookup()
 
 class Persona(models.Model):
     GENEROS = [
@@ -20,7 +44,7 @@ class Persona(models.Model):
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
     nacimiento = models.DateField(default=timezone.now)
-    dni = models.CharField(max_length=10, blank=True, null=True, unique=True)
+    dni = DNIField(max_length=10, blank=True, null=True, unique=True)
     obraSocial = models.CharField(max_length=50, blank=True, default="")
     obraSocial2 = models.CharField(max_length=50, blank=True, default="")
     afiliado = models.CharField(max_length=50, blank=True, default="")

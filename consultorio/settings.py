@@ -44,10 +44,11 @@ SECRET_KEY = 'django-insecure-75(gtt$ltn^brj0&u7*%7hiqm@)-&u6pxrnl7g#_j*bpfp2v3n
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-# append local ip, works for the first network adapter, disable virtual adapters
-localip = (lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] #socket.gethostbyname(socket.gethostname())
-ALLOWED_HOSTS.append(localip)
-qrimg = qrcode.make('http://'+localip+':8000')
+# append local ip, works for the first network adapter, (virtual adapters may interfere)
+LOCAL_IP = socket.gethostbyname(socket.gethostname()) 
+#(lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] works for linux but throws OSError with disabled network adapter
+ALLOWED_HOSTS.append(LOCAL_IP)
+qrimg = qrcode.make('http://'+LOCAL_IP+':8000')
 qrimg.save(BUNDLE_DIR / "historia/static/qrip.png")
 
 
@@ -62,7 +63,7 @@ SHOW_GIT_VERSIONS = env.bool('SHOW_GIT_VERSIONS', default=False)
 DATABASE = resolve_path(env('DATABASE'))
 DAYS_LOCAL_FREQ = int(env('DAYS_LOCAL_FREQ'))
 DAYS_ONLINE_FREQ = int(env('DAYS_ONLINE_FREQ'))
-RESTORED_TRASH_PATH = env('RESTORED_TRASH_PATH')
+RESTORED_TRASH_PATH = resolve_path(env('RESTORED_TRASH_PATH'))
 
 os.makedirs(DATABASE.parent, exist_ok=True)
 

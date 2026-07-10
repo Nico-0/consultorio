@@ -19,6 +19,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 import os
 from PIL import Image, UnidentifiedImageError
+from .exceptions import GApiReqError
+from httplib2 import ServerNotFoundError
 from django.core.files.base import ContentFile
 from io import BytesIO
 from .backup import get_last_backup_time, forzarBackup
@@ -48,7 +50,7 @@ def about(request):
     context['title'] = 'About'
     context['css'] = 'consultorio.css'
     context['activeC'] = True
-    context['ip'] = (lambda s: (s.connect(("8.8.8.8", 80)), s.getsockname()[0]))(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))[1] + ':8000' #socket.gethostbyname(socket.gethostname())
+    context['ip'] = settings.LOCAL_IP + ':8000'
     context['showVersiones'] = settings.SHOW_GIT_VERSIONS
     branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
     context['branch'] = branch
@@ -106,7 +108,11 @@ def backups(request):
     context['carpetaMedia'] = os.path.abspath(settings.MEDIA_ROOT)
     if request.method == 'POST':
         if 'generar' in request.POST:
-            forzarBackup()
+            try:
+                forzarBackup()
+                messages.success(request, 'Backup completado')
+            except (GApiReqError, ServerNotFoundError) as e:
+                messages.warning(request, f"Error backup: {e}")
             return redirect("backups")
     return render(request, 'backups.html', context)
 
@@ -349,8 +355,6 @@ def archivo(request, file_id):
 
 def drivelogin(request):
     from .backup import checkBackup
-    from .exceptions import GApiReqError
-    from httplib2 import ServerNotFoundError
     if request.method == 'POST':
         # se solicita login si fallaron las creds locales
         # se vuelve a llamar rutina de backup con nuevas creds

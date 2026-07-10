@@ -10,7 +10,7 @@ class PersonaForm(forms.ModelForm):
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Persona
-        fields = ['apellido', 'nombre', 'dni', 'email', 'nacimiento', 'sexo']
+        fields = ['apellido', 'nombre', 'dni', 'nacimiento', 'localidad', 'sexo', 'telefono']
         widgets = {'nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')}
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
