@@ -29,6 +29,10 @@ env_path = BASE_DIR / '.env'
 if not env_path.is_file():
     shutil.copy(BUNDLE_DIR / '.env.example', env_path)
 
+bs_path = BASE_DIR / 'settings.yaml'    #TODO remove this read from bundle dir directly with gauth = GoogleAuth(settings_file=custom_settings_path)
+if not bs_path.is_file():
+    shutil.copy(BUNDLE_DIR / 'settings.yaml', bs_path)
+
 def resolve_path(env_value):
     path = Path(env_value)
     if path.is_absolute(): return path

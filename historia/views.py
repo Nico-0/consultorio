@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.db.models import Q
+from django.db.models.deletion import RestrictedError
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 import os
@@ -45,22 +46,27 @@ def get_commits_api(): #deprecated
 
 def about(request):
     import subprocess
-    import socket
     context = {}
     context['title'] = 'About'
     context['css'] = 'consultorio.css'
     context['activeC'] = True
     context['ip'] = settings.LOCAL_IP + ':8000'
     context['showVersiones'] = settings.SHOW_GIT_VERSIONS
-    branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
-    context['branch'] = branch
     context['botonUpdate'] = False
     context['botonText'] = 'Actualizar'
 
     if(not settings.SHOW_GIT_VERSIONS): return render(request, 'about.html', context)
-    gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True)
-    if(gitcmd.returncode):
-        context['version'] = context['botonText'] = 'Error de git' # Git no instalado o falta carpeta .git
+    error = False
+    try:
+        branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
+        context['branch'] = branch
+        gitcmd = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True)
+        if(gitcmd.returncode): error = True # falta carpeta .git
+    except FileNotFoundError: # Git no instalado
+        print("git program FileNotFoundError")
+        error = True
+    if(error):
+        context['version'] = context['botonText'] = 'Error de git'
     else:
         commitActual = gitcmd.stdout.strip()
         context['version'] = commitActual
@@ -112,7 +118,7 @@ def backups(request):
                 forzarBackup()
                 messages.success(request, 'Backup completado')
             except (GApiReqError, ServerNotFoundError) as e:
-                messages.warning(request, f"Error backup: {e}")
+                messages.warning(request, f"Error backup: {e}") # Si no existe id de la carpeta entonces el server devuelve error File not Found - ID
             return redirect("backups")
     return render(request, 'backups.html', context)
 
@@ -243,6 +249,7 @@ def perfil(request, persona_id):
                 redirectx = validar_form_dni(request, form)
                 if redirectx: return redirectx
             form.save()
+            messages.success(request, "Datos personales actualizados")
             return redirect('/perfil/'+str(persona_id))
         if 'cargaOptica' in request.POST:
             optica_form = OpticaExamForm(request.POST, instance=entradaElegida)
@@ -251,7 +258,20 @@ def perfil(request, persona_id):
                 optica_exam.paciente = persona
                 optica_exam.fecha = diaElegido
                 optica_exam.save()
+                messages.success(request, "Historia clínica actualizada")
                 return redirect('/perfil/'+str(persona_id)+'?dia='+str(diaElegido))
+        if 'borrarEntrada' in request.POST:
+            entradaElegida.delete()
+            messages.success(request, f"{str(entradaElegida)} eliminada")
+            return redirect('/perfil/'+str(persona_id))
+        if 'borrarPaciente' in request.POST:
+            try:
+                persona.delete()
+                messages.success(request, f"Paciente {persona_id} {str(persona)} borrado")
+                return redirect('/')
+            except RestrictedError as e:
+                messages.warning(request, "Borre primero historias clínicas: "+str(e.restricted_objects))
+                return redirect('/perfil/'+str(persona_id))
         if 'cargaArchivo' in request.POST:
             import pillow_heif
             pillow_heif.register_heif_opener()
@@ -278,6 +298,7 @@ def perfil(request, persona_id):
                     imagen.imagen = img_content             
 
                     imagen.save()
+                    messages.success(request, "Imagen cargada: "+uploaded_file.name)
                     return redirect('/perfil/'+str(persona_id)+'?dia='+str(fecha))
                 else: print(formImagen.errors); messages.error(request, formImagen.errors)
             except UnidentifiedImageError: # es otro archivo
@@ -288,6 +309,7 @@ def perfil(request, persona_id):
                     archivo = formArchivo.save(commit=False)
                     archivo.entrada = entrada
                     archivo.save()
+                    messages.success(request, "Archivo cargado: "+uploaded_file.name)
                     return redirect('/perfil/'+str(persona_id)+'?dia='+str(fecha))
                 else: print(formArchivo.errors); messages.error(request, formArchivo.errors)
 
@@ -310,13 +332,12 @@ def comentarios(request, persona_id):
     return JsonResponse({'error': 'invalid method'}, status=405)
 
 def entrada(request, persona_id):
-    if request.method == 'POST':
+    if request.method == 'POST': # actualizar comentarios por ajax
         data = json.loads(request.body)
         new_value = data.get('value')
         diaElegido = dateparse.parse_datetime(data.get('date'))
         persona = Persona.objects.get(id=persona_id)
 
-        from historia.models import Entrada
         try:
             entrada, created = Entrada.objects.get_or_create(paciente=persona, fecha=diaElegido, defaults={"comentarios": ""})
             entrada.comentarios = new_value
@@ -342,7 +363,7 @@ def imagen(request, img_id):
         if 'borrar' in request.POST:
             img = get_object_or_404(Imagen, id=img_id)
             img.delete()
-            print(str(img_id) + " Deleted "+ img.filename)
+            messages.success(request, str(img_id) + " Borrado "+ img.filename)
     return redirect(request.META.get('HTTP_REFERER'))
 
 def archivo(request, file_id):
@@ -350,7 +371,7 @@ def archivo(request, file_id):
         if 'borrar' in request.POST:
             archivo = get_object_or_404(Archivo, id=file_id)
             archivo.delete()
-            print(str(file_id) + " Deleted "+ archivo.filename)
+            messages.success(request, str(file_id) + " Borrado "+ archivo.filename)
     return redirect(request.META.get('HTTP_REFERER'))
 
 def drivelogin(request):

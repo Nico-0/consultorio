@@ -19,7 +19,6 @@ filename = DATABASE.name
 BASE_DIR = settings.BASE_DIR
 mimeType = 'application/x-7z-compressed'
 BACKUP_TIMESTAMP_FILE = BASE_DIR / 'last_backup.txt'
-DRIVE_FOLDER_ID_FILE = BASE_DIR / 'drive_folder_id.txt' # Si no existe id de la carpeta entonces el server devuelve error File not Found - ID
 TEMP_CREDENTIALS_FILE = BASE_DIR / 'credentials.json'
 BACKUP_LOCATION = settings.BACKUP_LOCATION
 days_local_freq = settings.DAYS_LOCAL_FREQ
@@ -76,14 +75,6 @@ def get_last_backup_time():
     except Exception as e:
         print("⚠️🚨 Error reading backup time file:", e)
         return None, None
-    
-def get_set_drive_folder():
-    try:
-        with open(DRIVE_FOLDER_ID_FILE, 'r') as f:
-            settings.DRIVE_FOLDER_ID = f.read().strip()
-    except:
-        #can be set directly from settings instead
-        pass
 
 def initBackup():
     creds = check_creds()
@@ -91,6 +82,11 @@ def initBackup():
         rutinaBackup(creds)
     except (GApiReqError, ServerNotFoundError) as e:
         print(e)
+
+def initNoBackup():
+    creds = check_creds()
+    if(creds is not None): 
+        login_completed()
 
 def checkBackup():
     gauth = auth()

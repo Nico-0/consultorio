@@ -111,7 +111,7 @@ function launchCmdPython(scriptPath) {
 
 function launchCreateUser() {
   const managePath = app.isPackaged ? path.join(djangoDir, 'manage.exe') : "python " + path.join(djangoDir, 'manage.py');
-  const cmdArgs = ['/c', 'start', 'cmd', '/k', `"${managePath}" createsuperuser`];
+  const cmdArgs = ['/c', 'start', 'cmd', '/k', `"${managePath} migrate && ${managePath} createsuperuser"`];
   spawn('cmd.exe', cmdArgs, { shell: true });
 }
 

@@ -70,6 +70,16 @@
 	background-color:floralwhite;
 }
 
+a.daylink{
+	color: var(--bs-dark);
+	text-decoration: unset;
+	display: block;
+	width: fit-content;
+}
+a.daylink:hover{
+	color: var(--bs-link-hover-color);
+}
+
 #entradaHoy{
 	min-height: 150px;
 }
@@ -87,7 +97,7 @@
 .desactivado{
 	background: repeating-linear-gradient(
 	45deg, 
-	#cc7777, #eebbbb 5px,
+	#ffcccc, #eedddd 5px,
 	#eeeeee 20px, #ffffff 200px
 	);
 }

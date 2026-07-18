@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 import os, re
@@ -18,6 +18,10 @@ class DNIField(models.CharField):
         if isinstance(value, str):
             return re.sub(r'[^a-zA-Z0-9]', '', value)
         return value
+    
+    def deconstruct(self): # prevent migration because no custom parameters
+        name, path, args, kwargs = super().deconstruct()
+        return name, "django.db.models.CharField", args, kwargs
 
 @DNIField.register_lookup
 class DNIIContains(IContains):
@@ -96,6 +100,11 @@ class Entrada(models.Model):
 
     class Meta:
         ordering = ['-fecha']
+
+@receiver(post_save, sender=Entrada)
+def update_persona_timestamp(sender, instance, **kwargs):
+    persona = instance.paciente
+    persona.save(update_fields=['modificado'])
 
 def directorio(instance, filename):
     # MEDIA_ROOT/paciente_<id>/<filename>

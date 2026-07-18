@@ -15,7 +15,7 @@
 - Set authorized origins to `http://localhost:8080` and authorized redirect to `http://localhost:8080/`
 - Download and place `client_secrets.json` at the root of this server.
 - [Create a new test user](https://console.cloud.google.com/auth/audience) with your desired email.
-- Copy the ID of any Drive folder from the URL, and place it in `DRIVE_FOLDER_ID` inside `.env` or inside `drive_folder_id.txt`.
+- Copy the ID of any Drive folder from the URL, and place it in `DRIVE_FOLDER_ID` inside `.env`.
 
 ## Run the program
 

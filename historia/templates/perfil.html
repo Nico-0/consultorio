@@ -13,7 +13,7 @@
 
 {% if messages %}
 	{% for message in messages %}
-		<div class="alert alert-warning" role="alert">
+		<div class="alert alert-{{ message.tags }}" role="alert">
 			{% if message.tags %}{{ message.tags }}: {% endif %}{{ message }}
 		</div>
 	{% endfor %}
@@ -44,6 +44,10 @@
 					</div>
 					<textarea class="form-control comentario" id="comentarios" data-id="{{ persona.id }}" aria-label="With textarea" placeholder="Recuerdos personales del paciente">{{ persona.comentarios }}</textarea>
 				</div>
+				{% if not persona.activo %}<form method="POST" action="/perfil/{{persona.id}}">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-outline-danger" name="borrarPaciente" onclick="return confirm('Desea borrar al paciente {{persona.id}} {{persona.nombre}} {{persona.apellido}}?')">Borrar paciente</button>
+				</form>{% endif %}
 			</div>
 
 		</div>
@@ -69,6 +73,10 @@
 																			
 						<div class="d-flex justify-content-between">
 							<p class="titulo">{{ diaElegido|date:"l, j F Y" }}</p>
+							{% if entradaElegida and not persona.activo %}<form method="POST" action="/perfil/{{persona.id}}?dia={{ diaElegido|date:'Y-m-d' }}">
+								{% csrf_token %}
+								<button type="submit" class="btn btn-outline-danger" name="borrarEntrada" style="height: fit-content" onclick="return confirm('Desea borrar los datos del dia {{ diaElegido}}? Se borrarán tambien sus archivos')">Borrar día</button>
+							</form>{% endif %}
 							<button type="" class="btn saveIndicator" id="statusEntrada" disabled></button>
 						</div>
 
@@ -115,7 +123,7 @@
 					</div>
 					{% for entrada in entradas %}
 					<div class="p-2 entrada">
-						<p class="titulo" style="margin-bottom: .5rem;">{{ entrada.fecha|date:"l, j F Y" }}</p>
+						<a href="?dia={{entrada.fecha|date:'Y-m-d'}}" class="daylink"><p class="titulo" style="margin-bottom: .5rem;">{{ entrada.fecha|date:"l, j F Y" }}</p></a>
 
 						{% if APP_FLAVOR == 'OPTICAL' %}{% include "includes/_optical_display.html" %}
 						{% else %}<textarea class="form-control detalle mb-2" aria-label="With textarea" placeholder="Vacia" disabled>{{ entrada.comentarios }}</textarea>{% endif %}

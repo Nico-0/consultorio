@@ -9,7 +9,7 @@ a = Analysis(
     ['manage.py'],
     pathex=[],
     binaries=[],
-    datas=[('historia\\templates', 'historia\\templates'), ('historia\\static', 'historia\\static'), ('.env.example', '.')],
+    datas=[('historia\\templates', 'historia\\templates'), ('historia\\static', 'historia\\static'), ('.env.example', '.'), ('settings.yaml', '.')],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
